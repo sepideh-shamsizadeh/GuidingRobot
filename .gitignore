@@ -131,5 +131,4 @@ dmypy.json
 .idea/
 devel/
 src/CMakeLists.txt
-src/yolov7/
 
