@@ -2,13 +2,13 @@
 import argparse
 import time
 from pathlib import Path
-
+import sys
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
 import numpy as np
-
+import os
 from src.yolov7.models.experimental import attempt_load
 from src.yolov7.utils.datasets import LoadStreams, LoadImages
 from src.yolov7.utils.general import check_img_size, check_requirements, check_imshow, non_max_suppression, apply_classifier, \
@@ -20,14 +20,13 @@ from src.yolov7.utils.torch_utils import select_device, load_classifier, time_sy
 
 def detect_person(img0):
     poses = []
-    weights = 'yolov7.pt'
     imgsz = 640
     stride = 32
     conf_thres = 0.5
     iou_thres = 0.45
     nosave = False
     source= 'inference/images'
-    weights='src/yolov7/yolov7.pt'
+    weights = 'yolov7.pt'
     view_img= False
     save_txt= False
     project = 'runs/detect'
@@ -45,12 +44,13 @@ def detect_person(img0):
     set_logging()
     device = select_device('')
     half = device.type != 'cpu'  # half precision only supported on CUDA
-
+    here = os.path.dirname(os.path.abspath('yolov7'))
+    sys.path.append(here)
     # Load model
     model = attempt_load(weights, map_location=device)  # load FP32 model
     stride = int(model.stride.max())  # model stride
     imgsz = check_img_size(imgsz, s=stride)  # check img_size
-
+    s = ''
     img = letterbox(img0, imgsz, stride=stride)[0]
 
     # Convert
@@ -90,6 +90,34 @@ def detect_person(img0):
     pred = non_max_suppression(pred, conf_thres, iou_thres)
     t3 = time_synchronized()
     print(pred)
+    for i, det in enumerate(pred):
+        gn = torch.tensor(img0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
+        if len(det):
+            # Rescale boxes from img_size to im0 size
+            det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
+
+            # Print results
+            for c in det[:, -1].unique():
+                n = (det[:, -1] == c).sum()  # detections per class
+                s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
+                print(s)
+            # Write results
+            for *xyxy, conf, cls in reversed(det):
+                xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
+                line = (cls, *xywh)  # label format
+
+                if save_img or view_img:  # Add bbox to image
+                    label = f'{names[int(cls)]} {conf:.2f}'
+                    plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
+                    print('label',label)
+
+        # Print time (inference + NMS)
+        print(f'{s}Done. ({(1E3 * (t2 - t1)):.1f}ms) Inference, ({(1E3 * (t3 - t2)):.1f}ms) NMS')
+
+    # Stream results
+    cv2.imshow('str(p)', img0)
+    cv2.waitKey(0)  # 1 millisecond
+
     return poses
 
 
