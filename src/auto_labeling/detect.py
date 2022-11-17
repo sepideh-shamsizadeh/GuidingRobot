@@ -27,7 +27,7 @@ def detect_person(img0):
     iou_thres = 0.45
     nosave = False
     source= 'inference/images'
-    weights='yolov7.pt'
+    weights='src/yolov7/yolov7.pt'
     view_img= False
     save_txt= False
     project = 'runs/detect'
