@@ -9,7 +9,7 @@ from numpy import random
 
 from src.yolov7.models.experimental import attempt_load
 from src.yolov7.utils.datasets import letterbox
-from src.yolov7.utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging
+from src.yolov7.utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging, xyn2xy
 from src.yolov7.utils.plots import plot_one_box
 from src.yolov7.utils.torch_utils import select_device
 
@@ -73,7 +73,7 @@ def detect_person(img0):
             for *xyxy, conf, cls in reversed(det):
                 label = f'{names[int(cls)]} {conf:.2f}'
                 if 'person' in label:
-                    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
+                    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4))).view(-1).tolist()  # normalized xywh
                     line = (cls, *xywh)  # label format
                     plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
                     poses.append(xywh)
@@ -81,12 +81,13 @@ def detect_person(img0):
     # Stream results
     cv2.imshow('str(p)', img0)
     cv2.waitKey(0)  # 1 millisecond
+    cv2.imwrite('/home/sepideh/Pictures/2.1.png', img0)
 
     return poses
 
 
 if __name__ == '__main__':
-    img0 = cv2.imread("/home/sepideh/Pictures/1.png")  # BGR
+    img0 = cv2.imread("/home/sepideh/Pictures/2.png")  # BGR
     cv2.imshow("image", img0)
     cv2.waitKey(0)
     p = detect_person(img0)
