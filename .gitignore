@@ -132,3 +132,5 @@ dmypy.json
 devel/
 src/CMakeLists.txt
 
+.catkin_tools/       
+src/yolov7.pt
