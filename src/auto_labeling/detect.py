@@ -7,11 +7,14 @@ import numpy as np
 import torch
 from numpy import random
 
-from src.yolov7.models.experimental import attempt_load
-from src.yolov7.utils.datasets import letterbox, LoadImages
-from src.yolov7.utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging, xyn2xy
-from src.yolov7.utils.plots import plot_one_box
-from src.yolov7.utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
+here = os.path.dirname(os.path.abspath('yolov7'))
+sys.path.append(here)
+
+from models.experimental import attempt_load
+from utils.datasets import letterbox, LoadImages
+from utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging, xyn2xy
+from utils.plots import plot_one_box
+from utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
 
 
 def detect_person(img0):
@@ -19,8 +22,7 @@ def detect_person(img0):
     imgsz = 640
     conf_thres = 0.5
     iou_thres = 0.45
-    here = os.path.dirname(os.path.abspath('yolov7'))
-    sys.path.append(here)
+
     weights = 'yolov7.pt'
 
     # Initialize
@@ -48,7 +50,6 @@ def detect_person(img0):
     # Set Dataloader
     vid_path, vid_writer = None, None
 
-    dataset = LoadImages(source, img_size=imgsz, stride=stride)
     img = letterbox(img0, imgsz, stride=stride)[0]
 
     # Convert
@@ -93,7 +94,8 @@ def detect_person(img0):
 
     # Process detections
     for i, det in enumerate(pred):  # detections per image
-        p, s, im0, frame = 'image', '', img0, getattr(dataset, 'frame', 0)
+        im0 = img0
+        s = ''
         gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
         if len(det):
             # Rescale boxes from img_size to im0 size
@@ -112,8 +114,8 @@ def detect_person(img0):
                     label = f'{names[int(cls)]} {conf:.2f}'
                     plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
                     poses.append(xywh)
-    cv2.imshow("image", img0)
-    cv2.waitKey(0)
+    # cv2.imshow("image", img0)
+    # cv2.waitKey(0)
 
     return poses
 
