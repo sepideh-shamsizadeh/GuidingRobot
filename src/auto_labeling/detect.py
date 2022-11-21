@@ -81,7 +81,6 @@ def detect_person(img0):
     # Stream results
     cv2.imshow('str(p)', img0)
     cv2.waitKey(0)  # 1 millisecond
-    cv2.imwrite('/home/sepideh/Pictures/2.1.png', img0)
 
     return poses
 
