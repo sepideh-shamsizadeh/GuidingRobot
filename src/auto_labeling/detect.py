@@ -16,15 +16,9 @@ from utils.general import check_img_size, non_max_suppression, scale_coords, xyx
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
 
-
-def detect_person(img0):
-    poses = []
-    imgsz = 640
-    conf_thres = 0.5
-    iou_thres = 0.45
-
+def load_model():
     weights = 'yolov7.pt'
-
+    imgsz = 640
     # Initialize
     set_logging()
     device = select_device('')
@@ -40,16 +34,18 @@ def detect_person(img0):
 
     if half:
         model.half()  # to FP16
+    return model
 
-    # Second-stage classifier
-    classify = False
-    if classify:
-        modelc = load_classifier(name='resnet101', n=2)  # initialize
-        modelc.load_state_dict(torch.load('weights/resnet101.pt', map_location=device)['model']).to(device).eval()
 
-    # Set Dataloader
-    vid_path, vid_writer = None, None
-
+def detect_person(img0, model):
+    poses = []
+    imgsz = 640
+    conf_thres = 0.5
+    iou_thres = 0.45
+    device = select_device('')
+    stride = int(model.stride.max())  # model stride
+    half = device.type != 'cpu'
+    imgsz = check_img_size(imgsz, s=stride)  # check img_size
     img = letterbox(img0, imgsz, stride=stride)[0]
 
     # Convert
@@ -73,14 +69,7 @@ def detect_person(img0):
     if img.ndimension() == 3:
         img = img.unsqueeze(0)
 
-    # Warmup
-    if device.type != 'cpu' and (
-            old_img_b != img.shape[0] or old_img_h != img.shape[2] or old_img_w != img.shape[3]):
-        old_img_b = img.shape[0]
-        old_img_h = img.shape[2]
-        old_img_w = img.shape[3]
-        for i in range(3):
-            model(img, augment=False)[0]
+
 
     # Inference
     t1 = time_synchronized()
@@ -109,14 +98,15 @@ def detect_person(img0):
             for *xyxy, conf, cls in reversed(det):
                 xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                 line = (cls, *xywh)  # label format
-                print(names[int(cls)])
+
                 if names[int(cls)] == 'person':
+                    print(names[int(cls)])
                     label = f'{names[int(cls)]} {conf:.2f}'
                     plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
                     poses.append(xywh)
     # cv2.imshow("image", img0)
     # cv2.waitKey(0)
-
+    print(poses)
     return poses
 
 
@@ -125,4 +115,5 @@ if __name__ == '__main__':
     img0 = cv2.imread(source+'1.png')  # BGR
     cv2.imshow("image", img0)
     cv2.waitKey(0)
-    p = detect_person(img0)
+    model = load_model()
+    p = detect_person(img0, model)
