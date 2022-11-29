@@ -134,3 +134,6 @@ src/CMakeLists.txt
 
 .catkin_tools/       
 src/yolov7.pt
+2022-11-24-15-00-28.bag
+im_pose.txt
+

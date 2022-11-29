@@ -100,20 +100,20 @@ def detect_person(img0, model):
                 line = (cls, *xywh)  # label format
 
                 if names[int(cls)] == 'person':
-                    print(names[int(cls)])
+                    # print(names[int(cls)])
                     label = f'{names[int(cls)]} {conf:.2f}'
                     plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
                     poses.append([int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])])
     # cv2.imshow("image", img0)
     # cv2.waitKey(0)
-    print(poses)
+    # print(poses)
     return poses
 
 
 if __name__ == '__main__':
     source = "/home/sepideh/Pictures/"
     img0 = cv2.imread(source+'2.png')  # BGR
-    cv2.imshow("image", img0)
-    cv2.waitKey(0)
+    # cv2.imshow("image", img0)
+    # cv2.waitKey(0)
     model = load_model()
     p = detect_person(img0, model)
