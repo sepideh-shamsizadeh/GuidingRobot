@@ -36,11 +36,11 @@ def draw_circle_bndBOX(poses, im_p, img):
 
 
 if __name__ == '__main__':
-    im_p = [[896, 198, 924, 306], [423, 178, 484, 343]]
+    im_p = [[1365, 481, 1456, 718]]
     l_p = [[434, 343], [455, 330], [912, 294], [902, 295], [225, 320], [8, 246], [79, 360], [938, 252]]
     poses = check_positions(im_p, l_p)
-    source = "/home/sepideh/Pictures/"
-    img0 = cv2.imread(source + '2.png')  # BGR
+    source = "../../src/images/"
+    img0 = cv2.imread(source + '207.png')  # BGR
     cv2.imshow("image", img0)
     cv2.waitKey(0)
     draw_circle_bndBOX(poses, im_p, img0)

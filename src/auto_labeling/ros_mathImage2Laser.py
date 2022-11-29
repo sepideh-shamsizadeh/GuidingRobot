@@ -6,38 +6,37 @@ from geometry_msgs.msg import PoseArray, Pose
 from sensor_msgs.msg import Image
 
 
-pose_image = []
+images = []
 pose_laser = []
 model = load_model()
 
 
 def callback_image(data):
-    try:
-        cv_bridge = CvBridge()
-        cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
-        cv2.imwrite('../images/'+str(len(pose_image))+'.png', cv_image)
-        detected = detect_person(cv_image, model)
-        rospy.Subscriber('/dr_spaam_detections', PoseArray, callback, queue_size=2)
-        pose_image.append(detected)
-        with open('im_pose.txt', 'a') as f:
-            f.write(" ".join(str(item) for item in detected))
-            f.write('\n')
-    except CvBridgeError as e:
-        rospy.logerr('Converting Image Error.' + str(e))
-        return
+    images.append(data)
 
 
 def callback(poses):
-    with open('la_pose.txt', 'a') as f:
-        f.write(" ".join(str(item) for item in poses.poses))
-        f.write('\n')
-        pose_laser.append(poses.poses)
+    pose_laser.append(poses.poses)
 
 
 if __name__ == '__main__':
     rospy.loginfo('start matching')
     rospy.init_node('Matcher', anonymous=True, log_level=rospy.INFO)
-    rospy.Subscriber('/theta_camera/image_raw', Image, callback_image, queue_size=2, buff_size=2**24)
+    rospy.Subscriber('/theta_camera/image_raw', Image, callback_image, queue_size=2)
+    rospy.Subscriber('/dr_spaam_detections', PoseArray, callback, queue_size=2)
     rospy.spin()
-    print(len(pose_laser), len(pose_image))
-
+    print(len(pose_laser), len(images))
+    for i, p in enumerate(pose_laser):
+        with open('la_pose.txt', 'a') as f:
+            f.write(" ".join(str(item) for item in p))
+            f.write('\n')
+            f.write('*************************'+str(i)+'************************************')
+            f.write('\n')
+    for i, data in enumerate(images):
+        cv_bridge = CvBridge()
+        cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
+        cv2.imwrite('../images/' + str(i) + '.png', cv_image)
+        detected = detect_person(cv_image, model)
+        with open('im_pose.txt', 'a') as f:
+            f.write(" ".join(str(item) for item in detected))
+            f.write('\n')
