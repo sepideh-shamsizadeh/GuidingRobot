@@ -16,7 +16,6 @@ from utils.general import check_img_size, non_max_suppression, scale_coords, xyx
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
 
-
 def load_model():
     weights = 'yolov7.pt'
     imgsz = 640
@@ -101,18 +100,20 @@ def detect_person(img0, model):
                 line = (cls, *xywh)  # label format
 
                 if names[int(cls)] == 'person':
+                    # print(names[int(cls)])
                     label = f'{names[int(cls)]} {conf:.2f}'
                     plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
-                    poses.append(xywh)
+                    poses.append([int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])])
     # cv2.imshow("image", img0)
     # cv2.waitKey(0)
+    # print(poses)
     return poses
 
 
 if __name__ == '__main__':
-    source = "/home/ubuntu20-sep/Pictures/"
-    img0 = cv2.imread(source+'1.png')  # BGR
-    cv2.imshow("image", img0)
-    cv2.waitKey(0)
+    source = "/home/sepideh/Pictures/"
+    img0 = cv2.imread(source+'2.png')  # BGR
+    # cv2.imshow("image", img0)
+    # cv2.waitKey(0)
     model = load_model()
     p = detect_person(img0, model)
