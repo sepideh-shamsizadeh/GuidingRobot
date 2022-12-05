@@ -66,17 +66,18 @@ def draw_circle_bndBOX(poses, im_p, img):
     for pose in poses:
         cv2.circle(img, (int(pose[0]), int(pose[1])), 10, (0, 0, 255), 3)
         cv2.circle(img, (960, 480), 10, (255, 0, 0), 3)
+        cv2.circle(img, (1200, 480), 489, (255, 100, 0), 3)
     if len(im_p) == 4:
         cv2.rectangle(img, (im_p[0], im_p[1]), (im_p[2], im_p[3]), (0, 255, 0), 1)
     cv2.imshow("imag1e", img)
-    cv2.waitKey(0)
+    cv2.waitKey(1)
 
 
 if __name__ == '__main__':
     source = "../../src/images/"
     la_position = get_laser_positions()
     im_p = get_image_postions()
-    for i in range(50, 60):
+    for i in range(50, 1360):
         img0 = cv2.imread(source + str(i) + '.png')  # BGR
-        for j in range(i - 1, i + 10):
+        for j in range(i-10, i + 15):
             draw_circle_bndBOX(la_position[j], im_p[i], img0)
