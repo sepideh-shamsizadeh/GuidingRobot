@@ -16,6 +16,7 @@ from utils.general import check_img_size, non_max_suppression, scale_coords, xyx
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
 
+
 def load_model():
     weights = 'yolov7.pt'
     imgsz = 640

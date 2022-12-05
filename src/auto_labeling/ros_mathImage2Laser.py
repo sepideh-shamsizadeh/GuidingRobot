@@ -34,7 +34,7 @@ if __name__ == '__main__':
     for i, data in enumerate(images):
         cv_bridge = CvBridge()
         cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
-        # cv2.imwrite('../images/' + str(i) + '.png', cv_image)
+        cv2.imwrite('../images/' + str(i) + '.png', cv_image)
         detected = detect_person(cv_image, model)
         with open('im_pose.txt', 'a') as f:
             f.write(" ".join(str(item) for item in detected))
