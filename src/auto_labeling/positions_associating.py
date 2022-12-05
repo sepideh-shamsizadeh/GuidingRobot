@@ -59,3 +59,4 @@ if __name__ == '__main__':
         img0 = cv2.imread(source + str(i)+'.png')  # BGR
         for j in range(i-1, i+187):
             draw_circle_bndBOX(la_position[j], im_p, img0)
+
