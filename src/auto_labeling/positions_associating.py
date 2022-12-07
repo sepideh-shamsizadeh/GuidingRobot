@@ -42,13 +42,9 @@ def get_image_postions():
 
 
 def convert_robotF2imageF(pose):
-    theta = math.atan2(pose[1], pose[0])
-    p = (pose[1]) / math.sin(theta)
-    t = math.degrees(theta)
-    pp = math.degrees(p)
-    print(pp, t)
-    x = (180 - t) * (1920 / 360)
-    y = (90 - pp) * (960 / 180)
+    x = 1365 - (pose[0]*207)
+    y = 670 + (pose[1]*207)
+    print(x, y)
     return [x, y]
 
 
@@ -65,8 +61,11 @@ def check_positions(image_positions, laser_positions):
 def draw_circle_bndBOX(poses, im_p, img):
     for pose in poses:
         cv2.circle(img, (int(pose[0]), int(pose[1])), 10, (0, 0, 255), 3)
-        cv2.circle(img, (960, 480), 10, (255, 0, 0), 3)
-        cv2.circle(img, (1200, 480), 489, (255, 100, 0), 3)
+        cv2.circle(img, (1340, 770), 10, (255, 0, 0), 3)
+        cv2.circle(img, (760, 580), 10, (255, 0, 0), 3)
+        cv2.circle(img, (1920, 580), 10, (255, 0, 0), 3)
+        cv2.circle(img, (760, 960), 10, (255, 0, 0), 3)
+        cv2.circle(img, (1920, 960), 10, (255, 0, 0), 3)
     if len(im_p) == 4:
         cv2.rectangle(img, (im_p[0], im_p[1]), (im_p[2], im_p[3]), (0, 255, 0), 1)
     cv2.imshow("imag1e", img)
@@ -77,7 +76,9 @@ if __name__ == '__main__':
     source = "../../src/images/"
     la_position = get_laser_positions()
     im_p = get_image_postions()
-    for i in range(50, 1360):
-        img0 = cv2.imread(source + str(i) + '.png')  # BGR
-        for j in range(i-10, i + 15):
-            draw_circle_bndBOX(la_position[j], im_p[i], img0)
+    img0 = cv2.imread(source + str(0) + '.png')  # BGR
+    for i in range(0, 933):
+        if i<725:
+            j = i
+            img0 = cv2.imread(source + str(i) + '.png')  # BGR
+        draw_circle_bndBOX(la_position[i], im_p[j], img0)
