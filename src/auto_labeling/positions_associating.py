@@ -26,25 +26,28 @@ def get_laser_positions():
 
 def get_image_postions():
     im_p = []
+    im = []
     with open('../../src/yolov7/im_pose.txt') as f:
         contents = f.readlines()
         for i, line in enumerate(contents):
             if ']' in line:
-                x = line.split(']')[0]
-                c = x.split('[')[1].split(',')
-                b = []
-                for z in c:
-                    b.append(int(z))
-                im_p.append(b)
-            else:
-                im_p.append([])
+                x = line.split(']')
+                for xx in x:
+                    if '[' in xx:
+                        c = xx.split('[')[1].split(',')
+                        b = []
+                        for z in c:
+                            b.append(int(z))
+                        im.append(b)
+            im_p.append(im)
+            print(im)
+            im = []
     return im_p
 
 
 def convert_robotF2imageF(pose):
-    x = 1365 - (pose[0]*207)
-    y = 670 + (pose[1]*207)
-    print(x, y)
+    x = 1365 - (pose[0] * 207)
+    y = 670 + (pose[1] * 207)
     return [x, y]
 
 
@@ -77,8 +80,9 @@ if __name__ == '__main__':
     la_position = get_laser_positions()
     im_p = get_image_postions()
     img0 = cv2.imread(source + str(0) + '.png')  # BGR
-    for i in range(0, 933):
-        if i<725:
+    for i in range(0, 1399):
+        if i < 1184:
             j = i
             img0 = cv2.imread(source + str(i) + '.png')  # BGR
-        draw_circle_bndBOX(la_position[i], im_p[j], img0)
+        for m in range(len(im_p[j])):
+            draw_circle_bndBOX(la_position[i], im_p[j][m], img0)
