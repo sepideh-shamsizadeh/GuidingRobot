@@ -40,14 +40,21 @@ def get_image_postions():
                             b.append(int(z))
                         im.append(b)
             im_p.append(im)
-            print(im)
             im = []
     return im_p
 
 
 def convert_robotF2imageF(pose):
-    x = 1365 - (pose[0] * 207)
-    y = 670 + (pose[1] * 207)
+    O0x = int(1920/2)
+    O0y = int(960/2)
+    O1x = 1360
+    O1y = 770
+    theta = math.radians(-180)
+    pix_x = pose[0]*200
+    pix_y = pose[1]*200
+    x = O1x + pix_x*math.cos(theta) - pix_y*math.sin(theta)
+    y = O1y - (pix_x*math.sin(theta) + pix_y*math.cos(theta))
+
     return [x, y]
 
 
@@ -61,14 +68,15 @@ def check_positions(image_positions, laser_positions):
     return poses
 
 
-def draw_circle_bndBOX(poses, im_p, img):
+def draw_circle_bndBOX(poses, im_p, img, color=(255, 0, 0)):
     for pose in poses:
         cv2.circle(img, (int(pose[0]), int(pose[1])), 10, (0, 0, 255), 3)
-        cv2.circle(img, (1340, 770), 10, (255, 0, 0), 3)
-        cv2.circle(img, (760, 580), 10, (255, 0, 0), 3)
-        cv2.circle(img, (1920, 580), 10, (255, 0, 0), 3)
-        cv2.circle(img, (760, 960), 10, (255, 0, 0), 3)
-        cv2.circle(img, (1920, 960), 10, (255, 0, 0), 3)
+        cv2.circle(img, (1360, 770), 10, color, 3)
+        cv2.circle(img, (960, 480), 10, (22, 180, 77), 3)
+        cv2.line(img, (960, 0), (960, 960), (0, 255, 0), thickness=3, lineType=8)
+        cv2.line(img, (0, 480), (1920, 480), (0, 255, 0), thickness=3, lineType=8)
+        cv2.line(img, (1160, 770), (1360, 770), (255, 0, 0), thickness=3, lineType=8)
+        cv2.line(img, (1360, 770), (1360, 970), (255, 0, 0), thickness=3, lineType=8)
     if len(im_p) == 4:
         cv2.rectangle(img, (im_p[0], im_p[1]), (im_p[2], im_p[3]), (0, 255, 0), 1)
     cv2.imshow("imag1e", img)
@@ -77,9 +85,12 @@ def draw_circle_bndBOX(poses, im_p, img):
 
 if __name__ == '__main__':
     source = "../../src/images/"
+    p = convert_robotF2imageF([0, 1])
+    print(p)
     la_position = get_laser_positions()
     im_p = get_image_postions()
     img0 = cv2.imread(source + str(0) + '.png')  # BGR
+
     for i in range(0, 1399):
         if i < 1184:
             j = i
