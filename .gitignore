@@ -142,3 +142,15 @@ src/images1/
 2022-12-07-14-27-22.bag
 src/11.jpg
 src/semantic-segmentation/
+2023-01-12-15-27-58.bag
+2023-01-16-15-18-42.bag
+install/
+logs/
+outputImage.jpg
+src/auto_labeling/utils/front_lens.mp4
+src/auto_labeling/utils/left.mp4
+src/auto_labeling/utils/output.mp4
+src/auto_labeling/utils/rear_lens.mp4
+src/auto_labeling/utils/right.mp4
+src/data/
+src/images.zip

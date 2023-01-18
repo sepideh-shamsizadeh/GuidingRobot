@@ -31,6 +31,7 @@ if __name__ == '__main__':
             f.write(" ".join(str(item) for item in p))
             f.write('*************************'+str(i)+'************************************')
             f.write('\n')
+    pose_laser = []
     for i, data in enumerate(images):
         cv_bridge = CvBridge()
         cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")

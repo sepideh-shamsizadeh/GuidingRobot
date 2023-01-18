@@ -112,7 +112,7 @@ def detect_person(img0, model):
 
 
 if __name__ == '__main__':
-    source = "/home/sepideh/Pictures/"
+    source = "/home/sepid/Pictures/"
     img0 = cv2.imread(source+'2.png')  # BGR
     # cv2.imshow("image", img0)
     # cv2.waitKey(0)

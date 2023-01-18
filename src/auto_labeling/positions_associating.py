@@ -49,7 +49,7 @@ def convert_robotF2imageF(pose):
     O0y = int(960/2)
     O1x = 1360
     O1y = 770
-    theta = math.radians(-180)
+    theta = math.radians(0)
     pix_x = pose[0]*200
     pix_y = pose[1]*200
     x = O1x + pix_x*math.cos(theta) - pix_y*math.sin(theta)
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     im_p = get_image_postions()
     img0 = cv2.imread(source + str(0) + '.png')  # BGR
 
-    for i in range(0, 1399):
-        if i < 1184:
+    for i in range(0, 1047):
+        if i < 1000:
             j = i
             img0 = cv2.imread(source + str(i) + '.png')  # BGR
         for m in range(len(im_p[j])):
