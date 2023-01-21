@@ -49,7 +49,7 @@ def convert_robotF2imageF(pose):
     O0y = int(960/2)
     O1x = 1360
     O1y = 770
-    theta = math.radians(0)
+    theta = math.radians(10)
     pix_x = pose[0]*200
     pix_y = pose[1]*200
     x = O1x + pix_x*math.cos(theta) - pix_y*math.sin(theta)

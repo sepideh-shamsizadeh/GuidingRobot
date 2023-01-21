@@ -154,3 +154,6 @@ src/auto_labeling/utils/rear_lens.mp4
 src/auto_labeling/utils/right.mp4
 src/data/
 src/images.zip
+src/auto_labeling/utils/checkerboard_images/
+src/auto_labeling/utils/front_separate/
+src/auto_labeling/utils/rear_separate/
