@@ -96,8 +96,8 @@ if __name__ == '__main__':
     im_p = get_image_postions()
     img0 = cv2.imread(source + str(0) + '.png')  # BGR
 
-    for i in range(0, 1399):
-        if i < 1184:
+    for i in range(0, 1047):
+        if i < 1000:
             j = i
             img0 = cv2.imread(source + str(j) + '.png')  # BGR
             draw_circle_bndBOX(la_position[i], p[i], im_p[j], img0, color=(255, 0, 0),n=j)

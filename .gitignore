@@ -142,6 +142,24 @@ src/images1/
 2022-12-07-14-27-22.bag
 src/11.jpg
 src/semantic-segmentation/
+<<<<<<< HEAD
 2023-01-17-11-36-11.bag
 src/images.zip
 
+=======
+2023-01-12-15-27-58.bag
+2023-01-16-15-18-42.bag
+install/
+logs/
+outputImage.jpg
+src/auto_labeling/utils/front_lens.mp4
+src/auto_labeling/utils/left.mp4
+src/auto_labeling/utils/output.mp4
+src/auto_labeling/utils/rear_lens.mp4
+src/auto_labeling/utils/right.mp4
+src/data/
+src/images.zip
+src/auto_labeling/utils/checkerboard_images/
+src/auto_labeling/utils/front_separate/
+src/auto_labeling/utils/rear_separate/
+>>>>>>> 7ed57b5ecd4bdabaa5493cb968fccb4cc0015384
