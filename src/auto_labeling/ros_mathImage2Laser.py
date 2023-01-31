@@ -41,3 +41,4 @@ if __name__ == '__main__':
             f.write(" ".join(str(item) for item in detected))
             f.write('*************************' + str(i) + '************************************')
             f.write('\n')
+        images[i] = []
