@@ -16,10 +16,7 @@ images = glob.glob('checkerboard_images/'+fld+'/*.jpg')
 for fname in images:
     img = cv2.imread(fname)
     _img_shape = (960, 960)
-    cv2.imshow('img', img)
-    cv2.waitKey(1)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
 
     # Find the chess board corners
     ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
@@ -28,6 +25,9 @@ for fname in images:
         objpoints.append(objp)
         cv2.cornerSubPix(gray,corners,(3,3),(-1,-1),subpix_criteria)
         imgpoints.append(corners)
+        img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners, ret)
+        cv2.imshow('img', img)
+        cv2.waitKey(1)
 N_OK = len(objpoints)
 K = np.zeros((3, 3))
 D = np.zeros((4, 1))
