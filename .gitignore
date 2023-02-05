@@ -162,4 +162,10 @@ src/images.zip
 src/auto_labeling/utils/checkerboard_images/
 src/auto_labeling/utils/front_separate/
 src/auto_labeling/utils/rear_separate/
->>>>>>> 7ed57b5ecd4bdabaa5493cb968fccb4cc0015384
+
+src/auto_labeling/utils/back.png
+src/auto_labeling/utils/bottom.png
+src/auto_labeling/utils/front.png
+src/auto_labeling/utils/left.png
+src/auto_labeling/utils/right.png
+src/auto_labeling/utils/top.png

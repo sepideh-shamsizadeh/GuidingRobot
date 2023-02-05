@@ -68,7 +68,7 @@ def convertFace(imgIn, imgOut, faceIdx):
               A[2]*(1-mu)*(1-nu) + B[2]*(mu)*(1-nu) + C[2]*(1-mu)*nu+D[2]*mu*nu )
 
             outPix[xOut, yOut] = (int(round(r)), int(round(g)), int(round(b)))
-path = '../../images/7.png'
+path = '../utils/checkerboard_images/front/390.jpg'
 imgIn = Image.open(path)
 inSize = imgIn.size
 faceSize = int(inSize[0] / 4)
