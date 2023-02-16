@@ -13,7 +13,7 @@ model = load_model()
 
 
 def callback_image(data):
-    i= time.time()
+    i= gen1.__next__()
     cv_bridge = CvBridge()
     cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
     cv2.imwrite('../images/' + str(i) + '.png', cv_image)
@@ -25,15 +25,34 @@ def callback_image(data):
 
 
 def callback(poses):
-    i = time.time()
+    i = gen2.__next__()
     with open('la_pose.txt', 'a') as f:
         f.write(" ".join(str(item) for item in poses.poses))
         f.write('*****************************'+str(i)+'********************************')
         f.write('\n')
 
 
-if __name__ == '__main__':
+def generator1():
+    value = 0
+    # produce the current value of the counter
+    yield value
 
+    # increment the counter
+    value += 1
+
+
+def generator2():
+    value = 0
+    # produce the current value of the counter
+    yield value
+
+    # increment the counter
+    value += 1
+
+
+if __name__ == '__main__':
+    gen1 = generator1()
+    gen2 = generator2()
     rospy.loginfo('start matching')
     rospy.init_node('Matcher', anonymous=True, log_level=rospy.INFO)
     rospy.Subscriber('/theta_camera/image_raw', Image, callback_image, queue_size=2)
