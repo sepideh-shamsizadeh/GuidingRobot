@@ -22,7 +22,7 @@ def load_model():
     imgsz = 640
     # Initialize
     set_logging()
-    device = select_device('')
+    device = select_device('cpu')
     half = device.type != 'cpu'  # half precision only supported on CUDA
 
     # Load model
@@ -105,15 +105,16 @@ def detect_person(img0, model):
                     label = f'{names[int(cls)]} {conf:.2f}'
                     plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=1)
                     poses.append([int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])])
-    # cv2.imshow("image", img0)
-    # cv2.waitKey(0)
-    # print(poses)
+    cv2.imshow("image", img0)
+    cv2.imwrite('/home/sepid/Pictures/output.jpg', img0)
+    cv2.waitKey(0)
+    print(poses)
     return poses
 
 
 if __name__ == '__main__':
     source = "/home/sepid/Pictures/"
-    img0 = cv2.imread(source+'2.png')  # BGR
+    img0 = cv2.imread(source+'hospital.jpg')  # BGR
     # cv2.imshow("image", img0)
     # cv2.waitKey(0)
     model = load_model()

@@ -1,4 +1,3 @@
-import time
 
 import rospy
 import cv2
@@ -6,7 +5,6 @@ from cv_bridge import CvBridge, CvBridgeError
 from detect import detect_person, load_model
 from geometry_msgs.msg import PoseArray, Pose
 from sensor_msgs.msg import Image
-import gc
 
 
 model = load_model()

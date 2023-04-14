@@ -5,15 +5,14 @@ import cv2
 
 from cv_bridge import CvBridge, CvBridgeError
 
-
-
-
 cv_bridge = CvBridge()
+
+
 def to_ros_image(cv2_uint8_image, img_format="bgr"):
     # -- Check input.
     shape = cv2_uint8_image.shape  # (row, col, depth=3)
     print(shape)
-    assert(len(shape) == 3 and shape[2] == 3)
+    assert (len(shape) == 3 and shape[2] == 3)
 
     # -- Convert image to bgr format.
     if img_format == "rgb":  # If rgb, convert to bgr.
