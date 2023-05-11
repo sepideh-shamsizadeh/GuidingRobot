@@ -6,7 +6,7 @@ import os
 import glob
 
 # Defining the dimensions of checkerboard
-CHECKERBOARD = (3, 5)
+CHECKERBOARD = (6,8)
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # Creating vector to store vectors of 3D points for each checkerboard image
@@ -15,12 +15,14 @@ objpoints = []
 imgpoints = []
 
 # Defining the world coordinates for 3D points
+square_size = 0.025  # Set the size of your squares here (in meters)
+
 objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
-objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+objp[0, :, :2] = square_size * np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 prev_img_shape = None
 
 # Extracting path of individual image stored in a given directory
-images =  glob.glob('checkerboard_images/separates/*.jpg')
+images =  glob.glob('../../calib/checkerboard/*.png')
 for fname in images:
     img = cv2.imread(fname)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -45,8 +47,8 @@ for fname in images:
         img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
 
     cv2.imshow('img', img)
-    cv2.imwrite(fname, img)
-    cv2.waitKey(0)
+    # cv2.imwrite(fname, img)
+    cv2.waitKey(1)
 
 cv2.destroyAllWindows()
 

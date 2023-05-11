@@ -1,5 +1,5 @@
 #! usr/bin/env python
-
+import math
 import rospy
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
@@ -62,16 +62,24 @@ if __name__ == '__main__':
             cv_image = cv_bridge.imgmsg_to_cv2(img, "bgr8")
             cv2.imwrite('../GuidingRobot/src/calib/' + str(i) + '.png', cv_image)
 
-    for p in points:
-        if zzz < 2:
-            angles = np.linspace(0, 2 * np.pi, len(p.ranges))
-            x = np.multiply(p.ranges, np.cos(angles))
-            y = np.multiply(p.ranges, np.sin(angles))
-            fig = plt.figure()
-            plt.scatter(x, y, s=0.2)
-            plt.show()
-            zzz += 1
+    # for p in points:
+    #     if zzz < 2:
+    #         angle_min = p.angle_min
+    #         angle_increment = p.angle_increment
+    #         ranges = p.ranges
+    #         num_ranges = len(ranges)
+    #         x=[]
+    #         y=[]
+    #         for j in range(0, num_ranges):
+    #             angle = angle_min + j * angle_increment
+    #             r = ranges[j]
+    #             if not math.isinf(r) and r > 0.1:
+    #                 x.append(r * math.cos(angle))
+    #                 y.append(r * math.sin(angle))
+    #         fig = plt.figure()
+    #         plt.scatter(x, y, s=0.2)
+    #         plt.show()
+    #         zzz += 1
 
-x
 
 

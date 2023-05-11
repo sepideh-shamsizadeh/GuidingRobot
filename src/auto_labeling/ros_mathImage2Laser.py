@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import rospy
 import cv2
@@ -11,7 +12,7 @@ model = load_model()
 
 
 def callback_image(data):
-    i= gen1.__next__()
+    i= next(gen1)
     cv_bridge = CvBridge()
     cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
     cv2.imwrite('../images/' + str(i) + '.png', cv_image)
@@ -23,7 +24,7 @@ def callback_image(data):
 
 
 def callback(poses):
-    i = gen2.__next__()
+    i = next(gen2)
     with open('la_pose.txt', 'a') as f:
         f.write(" ".join(str(item) for item in poses.poses))
         f.write('*****************************'+str(i)+'********************************')
