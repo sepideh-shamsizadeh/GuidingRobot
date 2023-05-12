@@ -8,6 +8,7 @@ import sensor_msgs.point_cloud2 as pc2
 from sensor_msgs.msg import LaserScan
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 def generator1():
     num = 0
@@ -60,8 +61,8 @@ if __name__ == '__main__':
         if i == 1:
             cv_bridge = CvBridge()
             cv_image = cv_bridge.imgmsg_to_cv2(img, "bgr8")
-            cv2.imwrite('../GuidingRobot/src/calib/' + str(i) + '.png', cv_image)
-
+            cv2.imwrite('../GuidingRobot/src/calib/' + sys.argv[1] + '.png', cv_image)
+    #
     # for p in points:
     #     if zzz < 2:
     #         angle_min = p.angle_min

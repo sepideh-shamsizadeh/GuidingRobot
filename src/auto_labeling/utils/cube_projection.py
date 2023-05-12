@@ -25,7 +25,7 @@ class CubeProjection:
         for face in range(6):
             imgOut = Image.new('RGB', (faceSize, faceSize), 'black')
             self.convertFace(imgIn, imgOut, face)
-            imgOut.save(self.output_path+FACE_NAMES[face]+'.png')
+            imgOut.save(self.output_path+FACE_NAMES[face]+'.jpg')
 
     def outImg2XYZ(self, i, j, faceIdx, faceSize):
         a = 2.0 * float(i) / faceSize
@@ -87,7 +87,7 @@ class CubeProjection:
 
 
 if __name__ == '__main__':
-    images = glob.glob('../../calib/checkerboard/269.png')
+    images = glob.glob('../../calib/14.png')
     for fname in images:
 
         cube = CubeProjection(fname, '../../'+fname.split('.')[4])
