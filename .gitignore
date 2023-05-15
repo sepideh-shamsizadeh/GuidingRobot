@@ -142,59 +142,21 @@ src/images1/
 2022-12-07-14-27-22.bag
 src/11.jpg
 src/semantic-segmentation/
-<<<<<<< HEAD
-2023-01-17-11-36-11.bag
-src/images.zip
-
-=======
 2023-01-12-15-27-58.bag
 2023-01-16-15-18-42.bag
 install/
 logs/
 outputImage.jpg
-src/auto_labeling/utils/front_lens.mp4
-src/auto_labeling/utils/left.mp4
-src/auto_labeling/utils/output.mp4
-src/auto_labeling/utils/rear_lens.mp4
-src/auto_labeling/utils/right.mp4
+src/auto_labeling/utils/*.mp4
 src/data/
 src/images.zip
 src/auto_labeling/utils/checkerboard_images/
 src/auto_labeling/utils/front_separate/
 src/auto_labeling/utils/rear_separate/
 
-src/auto_labeling/utils/back.png
-src/auto_labeling/utils/bottom.png
-src/auto_labeling/utils/front.png
-src/auto_labeling/utils/left.png
-src/auto_labeling/utils/right.png
-src/auto_labeling/utils/top.png
-2023-02-06-14-48-31.bag
-2023-02-06-14-56-31.bag
-2023-04-13-10-44-54.bag
-2023-04-13-10-45-13.bag
-2023-04-13-10-45-43.bag
-2023-04-13-10-46-08.bag
-2023-04-13-10-46-53.bag
-2023-04-13-10-47-21.bag
-2023-04-13-10-47-52.bag
-2023-04-13-10-48-09.bag
-2023-04-13-10-48-24.bag
-2023-04-13-10-48-49.bag
-2023-04-13-10-49-18.bag
-2023-04-13-10-49-42.bag
-2023-04-13-10-50-15.bag
-2023-04-13-10-50-58.bag
-2023-04-13-10-51-27.bag
-2023-04-13-10-51-40.bag
-2023-04-13-10-52-04.bag
-2023-04-13-10-52-34.bag
-2023-04-13-10-53-15.bag
-2023-04-13-10-53-57.bag
-2023-04-13-10-54-28.bag
-2023-04-13-10-55-08.bag
-2023-04-13-10-56-21.bag
-2023-04-13-10-58-00.bag
+src/auto_labeling/utils/*.png
+
+*.bag
 scan.csv
 selected_points.csv
 
@@ -204,18 +166,7 @@ src/rear_scan/
 
 .catkin_tools/
 .idea/
-2023-05-10-12-05-55.bag
-2023-05-10-15-33-37.bag
-2023-05-10-17-17-58.bag
-2023-05-10-17-18-31.bag
-2023-05-10-17-19-04.bag
-2023-05-10-17-19-43.bag
-2023-05-10-17-20-06.bag
-2023-05-10-17-20-15.bag
-2023-05-10-17-20-23.bag
-2023-05-10-17-20-30.bag
-2023-05-10-17-20-35.bag
-2023-05-10-17-20-44.bag
+
 build/
 devel/
 install/
@@ -227,26 +178,13 @@ src/auto_labeling/__pycache__/
 src/auto_labeling/untitled.asv
 
 
-src/auto_labeling/utils/back.png
+src/auto_labeling/utils/*.png
 src/auto_labeling/utils/bottom.png
 
 src/auto_labeling/utils/checkerboard_images/
 src/auto_labeling/utils/
 src/auto_labeling/utils/find_AB.asv
 
-src/auto_labeling/utils/fish.png
-src/auto_labeling/utils/front.png
-src/auto_labeling/utils/front_lens.mp4
-src/auto_labeling/utils/left.mp4
-src/auto_labeling/utils/left.png
-src/auto_labeling/utils/output.mp4
-src/auto_labeling/utils/outputImage.jpg
-src/auto_labeling/utils/points.py
-src/auto_labeling/utils/rear_lens.mp4
-src/auto_labeling/utils/right.mp4
-src/auto_labeling/utils/right.png
-src/auto_labeling/utils/test.txt
-src/auto_labeling/utils/top.png
 src/auto_labeling/uv.asv
 src/auto_labeling/uv.m
 src/calib/
@@ -295,3 +233,5 @@ src/auto_labeling/uv.asv
 src/auto_labeling/uv.m
 src/calib/
 src/rear_scan/
+
+*.bag.png

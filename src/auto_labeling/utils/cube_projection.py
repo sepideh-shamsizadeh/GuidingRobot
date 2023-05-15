@@ -87,8 +87,8 @@ class CubeProjection:
 
 
 if __name__ == '__main__':
-    images = glob.glob('../../calib/14.png')
+    images = glob.glob('../../calib/scenes/*.png')
     for fname in images:
-
-        cube = CubeProjection(fname, '../../'+fname.split('.')[4])
+        print('..'+fname.split('.')[4])
+        cube = CubeProjection(fname, '..'+fname.split('.')[4])
         cube.cube_projection()

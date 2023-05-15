@@ -30,7 +30,7 @@ class ImageUtility:
             if self.finish:
                 cv2.imshow('image', self.image)
             k = cv2.waitKey(1) & 0xFF
-            if k == 27:
+            if k == 'q':
                 break
             elif k == ord('r'):
                 self.image = cv2.imread(self.path)
@@ -41,7 +41,6 @@ class ImageUtility:
                 print('undo')
                 self.undo()
                 self.copy_image = self.image.copy()
-
         cv2.destroyAllWindows()
 
     def reset(self):
@@ -160,7 +159,7 @@ def main():
     )
     parser.parse_args()
     args = vars(parser.parse_args())
-
+    print(args['path'])
     image = cv2.imread(args['path'])
     ImageUtility(image, args['path']).select_image()
 
