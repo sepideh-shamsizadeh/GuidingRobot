@@ -235,3 +235,8 @@ src/calib/
 src/rear_scan/
 src/auto_labeling/calib/scenes/*.jpg
 *.bag.png
+
+.gitignore.save
+src/auto_labeling/*.jpg
+src/auto_labeling/calib/scenes/back/
+
