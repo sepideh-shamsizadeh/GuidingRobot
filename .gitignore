@@ -231,7 +231,7 @@ src/auto_labeling/utils/top.png
 src/auto_labeling/utils/untitled.m
 src/auto_labeling/uv.asv
 src/auto_labeling/uv.m
-src/calib/
+
 src/rear_scan/
 src/auto_labeling/calib/scenes/*.jpg
 *.bag.png
@@ -240,3 +240,4 @@ src/auto_labeling/calib/scenes/*.jpg
 src/auto_labeling/*.jpg
 src/auto_labeling/calib/scenes/back/
 
+src/auto_labeling/calib/scenes/*
