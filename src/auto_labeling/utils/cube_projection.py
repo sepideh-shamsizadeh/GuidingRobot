@@ -5,12 +5,13 @@ import glob
 
 
 class CubeProjection:
-    def __init__(self, input_path, output_path):
-        self.input_path = input_path
+    def __init__(self, imgIn, output_path):
         self.output_path = output_path
+        self.imagin = imgIn
+        self.sides = []
 
     def cube_projection(self):
-        imgIn = Image.open(self.input_path)
+        imgIn = self.imagin
         inSize = imgIn.size
         faceSize = int(inSize[0]/4)
         components = self.input_path.rsplit('.',2)
@@ -24,9 +25,12 @@ class CubeProjection:
         }
         for face in range(6):
             imgOut = Image.new('RGB', (faceSize, faceSize), 'black')
-            self.convertFace(imgIn, imgOut, face)
-            print(self.output_path+FACE_NAMES[face]+'.jpg')
-            imgOut.save(self.output_path+FACE_NAMES[face]+'.jpg')
+            side = self.convertFace(imgIn, imgOut, face)
+            if self.output_path != '':
+                print(self.output_path+FACE_NAMES[face]+'.jpg')
+                imgOut.save(self.output_path+FACE_NAMES[face]+'.jpg')
+            else:
+                self.sides.append({FACE_NAMES[face]: side})
 
     def outImg2XYZ(self, i, j, faceIdx, faceSize):
         a = 2.0 * float(i) / faceSize
@@ -94,5 +98,6 @@ if __name__ == '__main__':
         print(fname.split('/'))
         name = [z for z in fname.split('/') if '.png' in z][0]
         print(name.split('.')[0])
-        cube = CubeProjection(fname, '../../../src/calib/checkerboard/'+name.split('.')[0])
+        imgIn = Image.open(fname)
+        cube = CubeProjection(imgIn, '../../../src/calib/checkerboard/'+name.split('.')[0])
         cube.cube_projection()

@@ -1,4 +1,4 @@
-filename = '../../src/calib/ABback.txt'
+filename = '../../src/calib/ABfront.txt'
 A = []
 B = []
 xt = []
@@ -20,5 +20,5 @@ with open(filename, 'r') as file:
 
 print("A:", A)
 print("B:", B)
-print("xt:", xt)
-print("yt:", yt)
+print("X:", xt)
+print("Y:", yt)

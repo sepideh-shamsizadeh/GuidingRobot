@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import sys
 import time
@@ -10,11 +12,11 @@ from numpy import random
 here = os.path.dirname(os.path.abspath('yolov7'))
 sys.path.append(here)
 
-from models.experimental import attempt_load
-from utils.datasets import letterbox, LoadImages
-from utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging, xyn2xy
-from utils.plots import plot_one_box
-from utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
+from src.yolov7.models.experimental import attempt_load
+from src.yolov7.utils.datasets import letterbox, LoadImages
+from src.yolov7.utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging, xyn2xy
+from src.yolov7.utils.plots import plot_one_box
+from src.yolov7.utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
 
 
 def load_model():

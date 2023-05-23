@@ -6,6 +6,9 @@ from sensor_msgs.msg import Image
 import sys
 
 
+
+
+
 def counter():
     num = 0
     while True:

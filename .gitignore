@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+src/DR-SPAAM-Detector/
 
 # Distribution / packaging
 .Python
@@ -241,3 +242,4 @@ src/auto_labeling/*.jpg
 src/auto_labeling/calib/scenes/back/
 
 src/auto_labeling/calib/scenes/*
+*.png

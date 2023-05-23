@@ -1,60 +1,67 @@
 #!/usr/bin/env python
+import math
+import csv
 
 import rospy
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-from detect import detect_person, load_model
-from geometry_msgs.msg import PoseArray, Pose
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, LaserScan
+from message_filters import ApproximateTimeSynchronizer, Subscriber
+import numpy as np
+import os
+lsmsg=None
+
+def counter():
+    num = 0
+    while True:
+        yield num
+        num += 1
 
 
-model = load_model()
+
+def laser_scan2xy(msg):
+    angle_min = msg.angle_min
+    angle_increment = msg.angle_increment
+    print(angle_min, angle_increment)
+    xy_points = []
+
+    return xy_points
 
 
-def callback_image(data):
-    i= next(gen1)
-    cv_bridge = CvBridge()
-    cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
-    cv2.imwrite('../images/' + str(i) + '.png', cv_image)
-    detected = detect_person(cv_image, model)
-    with open('im_pose.txt', 'a') as f:
-        f.write(" ".join(str(item) for item in detected))
-        f.write('*********************'+str(i)+'****************************************')
-        f.write('\n')
+def scan_callbask(scan_msg):
+    pass
+
+def callback(imgs_msg):
+    global image
+    global lsmsg
+    i = next(cnt)
+    ls_msg = rospy.wait_for_message('/dr_spaam_detections', LaserScan, timeout=6.0)
+    lsmsg = ls_msg
+    cvb = CvBridge()
+    image = cvb.imgmsg_to_cv2(imgs_msg, 'bgr8')
+    scan_callbask(ls_msg)
+    laser_scan2xy(ls_msg)
+    # cv2.imwrite('img' + str(i) + '.png', image)
+    with open('scan_data1.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(ls_msg.ranges)
 
 
-def callback(poses):
-    i = next(gen2)
-    with open('la_pose.txt', 'a') as f:
-        f.write(" ".join(str(item) for item in poses.poses))
-        f.write('*****************************'+str(i)+'********************************')
-        f.write('\n')
-
-
-def generator1():
-    value = 0
-    # produce the current value of the counter
-    yield value
-
-    # increment the counter
-    value += 1
-
-
-def generator2():
-    value = 0
-    # produce the current value of the counter
-    yield value
-
-    # increment the counter
-    value += 1
+def draw_circle_bndBOX(u, v, img):
+    cv2.circle(img, (int(u), int(v)), 10, (0, 0, 255), 3)
+    cv2.imshow('image', img)
+    cv2.waitKey(0)
 
 
 if __name__ == '__main__':
-    gen1 = generator1()
-    gen2 = generator2()
-    rospy.loginfo('start matching')
-    rospy.init_node('Matcher', anonymous=True, log_level=rospy.INFO)
-    rospy.Subscriber('/theta_camera/image_raw', Image, callback_image, queue_size=2)
-    rospy.Subscriber('/dr_spaam_detections', PoseArray, callback, queue_size=2)
+    cnt = counter()
+    rospy.loginfo('start test laser and camera')
+    rospy.init_node('LaserCamera', anonymous=True, log_level=rospy.INFO)
+    image_sub = rospy.Subscriber("/theta_camera/image_raw", Image, callback)
     rospy.spin()
+
+
+
+
+
 
