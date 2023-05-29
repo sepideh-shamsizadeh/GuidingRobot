@@ -2,11 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+src/auto_labeling/calib.zip
 # C extensions
 *.so
 src/DR-SPAAM-Detector/
-
+data/
 # Distribution / packaging
 .Python
 build/

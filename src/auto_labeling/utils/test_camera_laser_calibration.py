@@ -18,16 +18,6 @@ def counter():
         num += 1
 
 
-
-def laser_scan2xy(msg):
-    angle_min = msg.angle_min
-    angle_increment = msg.angle_increment
-    print(angle_min, angle_increment)
-    xy_points = []
-
-    return xy_points
-
-
 def scan_callbask(scan_msg):
     pass
 
@@ -40,17 +30,12 @@ def callback(imgs_msg):
     cvb = CvBridge()
     image = cvb.imgmsg_to_cv2(imgs_msg, 'bgr8')
     scan_callbask(ls_msg)
-    laser_scan2xy(ls_msg)
-    # cv2.imwrite('img' + str(i) + '.png', image)
-    # with open('scan_data.csv', 'a', newline='') as file:
-    #     writer = csv.writer(file)
-    #     writer.writerow(ls_msg.ranges)
+    cv2.imwrite('img' + str(i) + '.png', image)
+    with open('scan_data.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(ls_msg.ranges)
 
 
-def draw_circle_bndBOX(u, v, img):
-    cv2.circle(img, (int(u), int(v)), 10, (0, 0, 255), 3)
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
 
 if __name__ == '__main__':
     cnt = counter()
