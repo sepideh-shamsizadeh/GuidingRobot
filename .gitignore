@@ -5,7 +5,6 @@ __pycache__/
 src/auto_labeling/calib.zip
 # C extensions
 *.so
-src/DR-SPAAM-Detector/
 data/
 # Distribution / packaging
 .Python
@@ -205,7 +204,7 @@ src/auto_labeling/__pycache__/
 src/auto_labeling/untitled.asv
 src/auto_labeling/utils/__init__.py
 src/auto_labeling/utils/back.png
-src/auto_labeling/utils/board_pixels.py
+
 src/auto_labeling/utils/bottom.png
 src/auto_labeling/utils/camer_calibration.m
 src/auto_labeling/utils/checkerboard_images/
@@ -222,11 +221,11 @@ src/auto_labeling/utils/left.png
 src/auto_labeling/utils/linesDetected.jpg
 src/auto_labeling/utils/output.mp4
 src/auto_labeling/utils/outputImage.jpg
-src/auto_labeling/utils/points.py
+
 src/auto_labeling/utils/rear_lens.mp4
 src/auto_labeling/utils/right.mp4
 src/auto_labeling/utils/right.png
-src/auto_labeling/utils/rosbag2image.py
+
 src/auto_labeling/utils/test.txt
 src/auto_labeling/utils/top.png
 src/auto_labeling/utils/untitled.m
