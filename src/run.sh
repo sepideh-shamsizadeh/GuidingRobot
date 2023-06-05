@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the path to the folder of images
-IMAGE_DIR="auto_labeling/calib/scenes/front"
+IMAGE_DIR="auto_labeling/calib/scenes/bottom"
 
 # Loop through all the files in the folder
 for IMAGE_FILE in "$IMAGE_DIR"/*; do

@@ -13,6 +13,7 @@ import detect_people
 
 model = detect_people.load_model()
 
+
 def counter():
     num = 0
     while True:
@@ -180,6 +181,7 @@ def check_points(x_y, p_uv, person):
 def selected_point(side_xy, side_info, face, detected):
     # print(face)
     XY_people = []
+    # print(detected)
     for person in detected:
         p = []
         x_y = []
@@ -189,12 +191,17 @@ def selected_point(side_xy, side_info, face, detected):
             u, v = convert_robotF2imageF(xy[0], xy[1], side_info)
             if face == 'back':
                 v -= 45
+            if face == 'left':
+                u += 30
+                v -= 20
             # print('u,v', u, v)
             # draw_circle_bndBOX(u, v, cv_image)
+            # print('(u, v)', (u, v))
+            # print('x,y', (xy[0], xy[1]))
             if check_intersection(person, (u, v)):
                 p.append((u, v))
-                # print('p', p)
                 x_y.append((xy[0], xy[1]))
+
         # print('len', len(p))
         if len(p) > 1:
             x, y = check_points(x_y, p, person)
@@ -259,7 +266,7 @@ if __name__ == '__main__':
             scan.append(ranges)
 
     dr_spaam = []
-    with open('/home/sepid/workspace/Thesis/GuidingRobot/data/drspaam_data.csv', 'r') as file:
+    with open('/home/sepid/workspace/Thesis/GuidingRobot/data/drspaam4_data.csv', 'r') as file:
         # Create a CSV reader object
         reader = csv.reader(file)
         # Read each row of the CSV file
@@ -268,11 +275,13 @@ if __name__ == '__main__':
 
     data = {}
     # for i in range(36, int(len(scan)/2)):
-    for i in range(len(dr_spaam)):  # Process the data
+    for i in range(len(dr_spaam)):
+
         path = '/home/sepid/workspace/Thesis/GuidingRobot/data/image_' + str(i) + '.jpg'
+        print(path)
         if os.path.exists(path):
             img = cv2.imread(path)
-            # print()
+#             # print()
             left, right, front, back = laser_scan2xy(scan[i])
             back_xy = []
             left_xy = []
@@ -295,12 +304,12 @@ if __name__ == '__main__':
             sides = CubeProjection(img, '')
             sides.cube_projection()
             people = []
-            # print(dr_spaam[i])
+            print(dr_spaam[i])
             for face, side_img in sides.sides.items():
                 if face in FACE_NAMES:
                     cv_image = np.array(side_img)
                     detected = detect_people.detect_person(cv_image, model)
-                    # print(detected)
+#                     # print(detected)
 
                     if face == 'back':
                         XY = selected_point(back_xy, back_info, face, detected)
@@ -327,14 +336,18 @@ if __name__ == '__main__':
                                 people.append((xy[0], xy[1]))
 
             data = []
-            for k, p in enumerate(people):
-                position = {'x ': p[0], 'y ': p[1]}
-                pp = {'id ' + str(k): position}
-                data.append(pp)
-            yaml_data = {'frame ' + str(next(counter_gen)): data}
-            output_file = 'output.yaml'
+            # print(people)
+            people = list(dict.fromkeys(people))
+            if len(people) > 0:
+                for k, p in enumerate(people):
+                    if abs(p[0]) < 10 and abs(p[1]) < 10:
+                        position = {'x': p[0], 'y': p[1]}
+                        pp = {'id' + str(k): position}
+                        data.append(pp)
+                yaml_data = {'frame ' + str(next(counter_gen)): data}
+                output_file = 'output1.yaml'
 
-            # Open the file in write mode
-            with open(output_file, 'a') as file:
-                # Write the YAML data to the file
-                yaml.dump(yaml_data, file)
+                # Open the file in write mode
+                with open(output_file, 'a') as file:
+                    # Write the YAML data to the file
+                    yaml.dump(yaml_data, file)
