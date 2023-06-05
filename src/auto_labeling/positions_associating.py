@@ -160,22 +160,46 @@ def check_intersection(d_bound, point):
     if d_bound[0] < point[0] < d_bound[2]:
         if d_bound[1] < point[1] < d_bound[3]:
             return True
+        elif abs(d_bound[3] - point[1]) <= 25:
+            return True
+    elif abs(d_bound[0] - point[0]) <= 25 or abs(point[0] - d_bound[2]) <= 25:
+        if d_bound[1] < point[1] < d_bound[3]:
+            return True
+        elif abs(d_bound[3] - point[1]) <= 25:
+            return True
     return False
 
+def distance(x1, y1, x2, y2):
+    # Calculate the Euclidean distance between two points
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 def check_points(x_y, p_uv, person):
-    avgx = person[0] + abs(person[0] - person[2]) / 2
-    avgy = person[1] + abs(person[1] - person[3]) / 2
+    avgx = (person[0] + person[2]) / 2
+    avgy = (person[1] + person[3]) / 2
     # print('avg', avgx, avgy)
-    inside = []
-    min_index = 0
-    for p in p_uv:
-        # print(p)
-        inside.append((abs(avgx - p[0]), abs(avgy - p[1])))
-    min_index = min(range(len(inside)), key=lambda i: inside[i])
-    # print('in', inside)
-    # print('min', min_index)
-    return x_y[min_index]
+    closest_distance = float('inf')
+    closest_point = None
+    for i, p in enumerate(p_uv):
+        dist = distance(p[0], p[1], avgx, avgy)
+        if dist < closest_distance:
+            closest_distance = dist
+            closest_point = x_y[i]
+    return closest_point
+
+
+def check_xy(xy, face):
+    x = xy[0]
+    y = xy[1]
+    if face == 'back':
+        if xy[0] < 1.3 and abs(xy[1]) < 1.3:
+            x = xy[0] + 0.5
+    elif face == 'front':
+        if abs(xy[0]) < 1.3 and abs(xy[1]) < 1.3:
+            x = xy[0] + 0.3
+    elif face == 'left':
+        if abs(xy[0]) < 1.3 and abs(xy[1]) < 1.3:
+            y = xy[1] - 1
+    return x, y
 
 
 def selected_point(side_xy, side_info, face, detected):
@@ -188,9 +212,15 @@ def selected_point(side_xy, side_info, face, detected):
         x = 0
         y = 0
         for xy in side_xy:
-            u, v = convert_robotF2imageF(xy[0], xy[1], side_info)
+            x, y = check_xy(xy, face)
+            u, v = convert_robotF2imageF(x, y, side_info)
+            if u < 0:
+                u = 0
+            if v < 0:
+                v = 0
             if face == 'back':
-                v -= 45
+                v -= 90
+                u += 20
             if face == 'left':
                 u += 30
                 v -= 20
@@ -199,16 +229,21 @@ def selected_point(side_xy, side_info, face, detected):
             # print('(u, v)', (u, v))
             # print('x,y', (xy[0], xy[1]))
             if check_intersection(person, (u, v)):
+                # print('(u, v)', (u, v))
+                # print('x,y', (xy[0], xy[1]))
                 p.append((u, v))
                 x_y.append((xy[0], xy[1]))
-
-        # print('len', len(p))
+        x = 0
+        y = 0
+        # print('xy', x_y)
+        for i, pr in enumerate(XY_people):
+            if pr in x_y:
+                p.pop(i)
+        # print(p)
         if len(p) > 1:
             x, y = check_points(x_y, p, person)
         elif len(p) == 1:
             x, y = x_y[0]
-        # print('x_y', x_y)
-        # print('x,y', x, y)
         XY_people.append((x, y))
 
     return XY_people
@@ -218,6 +253,21 @@ def draw_circle_bndBOX(u, v, img):
     cv2.circle(img, (int(u), int(v)), 10, (0, 0, 255), 3)
     cv2.imshow('image', img)
     cv2.waitKey(0)
+
+
+def write_output(people, fid, file_name):
+    data = []
+    for k, p in enumerate(people):
+        position = {'x': p[0], 'y': p[1]}
+        pp = {'id' + str(k): position}
+        data.append(pp)
+    yaml_data = {'frame ' + str(fid): data}
+    output_file = file_name
+
+    # Open the file in write mode
+    with open(output_file, 'a') as file:
+        # Write the YAML data to the file
+        yaml.dump(yaml_data, file)
 
 
 if __name__ == '__main__':
@@ -233,8 +283,8 @@ if __name__ == '__main__':
     }
 
     right_info = {
-        'H': np.array([0.13646, -0.033852, -0.018656, 0.021548, 0.026631, 0.13902, -0.023934, 0.11006, -0.0037212]),
-        'fu': 399373379354,
+        'H': np.array([1.3646, -0.33852, -0.18656, 0.21548, 0.26631, 1.3902, -0.2393, 1.1006, -0.037212]),
+        'fu': 253.399373379354,
         'fv': 247.434371718165,
         'u0': 246.434570692999,
         'v0': 239.287976204900
@@ -275,41 +325,54 @@ if __name__ == '__main__':
 
     data = {}
     # for i in range(36, int(len(scan)/2)):
-    for i in range(len(dr_spaam)):
+    for i in range(0, len(dr_spaam)):
 
         path = '/home/sepid/workspace/Thesis/GuidingRobot/data/image_' + str(i) + '.jpg'
         print(path)
         if os.path.exists(path):
             img = cv2.imread(path)
-#             # print()
-            left, right, front, back = laser_scan2xy(scan[i])
+            #             # print()
+            # left, right, front, back = laser_scan2xy(scan[i])
             back_xy = []
             left_xy = []
             right_xy = []
             front_xy = []
             for d in dr_spaam[i]:
                 dr_value = tuple_of_floats = ast.literal_eval(d)
-                dd = (round(dr_value[0]), round(dr_value[1]))
-                if dd in back:
-                    back_xy.append((dr_value[0], dr_value[1]))
-                elif dd in front:
-                    front_xy.append((dr_value[0], dr_value[1]))
-                elif dd in right:
-                    right_xy.append((dr_value[0], dr_value[1]))
-                elif dd in left:
-                    left_xy.append((dr_value[0], dr_value[1]))
+                x = dr_value[0]
+                y = dr_value[1]
+                if abs(x) < 3 and abs(y) < 3:
+                    if y >= 0:
+                        if x > 0 and x >= y:
+                            back_xy.append((x, y))
+                        elif 0 < x < y:
+                            right_xy.append((x, y))
+                        elif x < 0 and abs(x) < y:
+                            right_xy.append((x, y))
+                        elif x < 0 and abs(x) >= y:
+                            front_xy.append((x, y))
+                    else:
+                        if x > 0 and x >= abs(y):
+                            back_xy.append((x, y))
+                        elif 0 < x < abs(y):
+                            left_xy.append((x, y))
+                        elif x < 0 and abs(x) < abs(y):
+                            left_xy.append((x, y))
+                        elif x < 0 and abs(x) >= abs(y):
+                            front_xy.append((x, y))
+            # print(left_xy)
             # cv2.imshow('img1', img)
             # cv2.waitKey(0)
             img = Image.fromarray(img)
             sides = CubeProjection(img, '')
             sides.cube_projection()
             people = []
-            print(dr_spaam[i])
+            # print(dr_spaam[i])
             for face, side_img in sides.sides.items():
                 if face in FACE_NAMES:
                     cv_image = np.array(side_img)
                     detected = detect_people.detect_person(cv_image, model)
-#                     # print(detected)
+                    #                     # print(detected)
 
                     if face == 'back':
                         XY = selected_point(back_xy, back_info, face, detected)
@@ -335,19 +398,11 @@ if __name__ == '__main__':
                             if xy[0] != 0 and xy[1] != 0:
                                 people.append((xy[0], xy[1]))
 
-            data = []
-            # print(people)
             people = list(dict.fromkeys(people))
             if len(people) > 0:
-                for k, p in enumerate(people):
-                    if abs(p[0]) < 10 and abs(p[1]) < 10:
-                        position = {'x': p[0], 'y': p[1]}
-                        pp = {'id' + str(k): position}
-                        data.append(pp)
-                yaml_data = {'frame ' + str(next(counter_gen)): data}
-                output_file = 'output1.yaml'
+                fid = next(counter_gen)
+                file_name = 'output1.yaml'
+                write_output(people, fid, file_name)
 
-                # Open the file in write mode
-                with open(output_file, 'a') as file:
-                    # Write the YAML data to the file
-                    yaml.dump(yaml_data, file)
+            file_name = 'output1i.yaml'
+            write_output(people, i, file_name)
