@@ -9,6 +9,12 @@ def parse_yaml_file(file_path):
         data = yaml.safe_load(file)
     return data
 
+def mahalanobis_distance(x, y, covariance):
+    diff = x - y
+    inv_cov = np.linalg.inv(covariance)
+    distance = np.sqrt(np.dot(np.dot(diff, inv_cov), diff.T))
+    return distance
+
 def create_measurement(measurements):
     return measurements[:, 0]
 
