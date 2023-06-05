@@ -1,91 +1,53 @@
-import yaml
 import numpy as np
-from scipy.linalg import block_diag
+import yaml
 from filterpy.kalman import UnscentedKalmanFilter
 from filterpy.kalman import JulierSigmaPoints
 from filterpy.common import Q_discrete_white_noise
 
-
-def load_data_from_yaml(file_path):
+def parse_yaml_file(file_path):
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
     return data
 
+def create_measurement(measurements):
+    return measurements[:, 0]
 
-def unscented_kalman_filter(z, R, Q):
-    def fx(x, dt):
-        # State transition function
-        # Here, assume a constant velocity motion model
-        x[0] += dt * x[2]
-        x[1] += dt * x[3]
-        return x
+def create_ukf():
+    ukf = UnscentedKalmanFilter(dim_x=2, dim_z=2, dt=1.0, points=JulierSigmaPoints(n=2, kappa=1), hx=lambda x: x, fx=lambda x, dt: x)
+    ukf.x = np.array([0., 0.])  # initial state
+    ukf.P *= 0.1  # initial state covariance
+    ukf.R = np.diag([0.1, 0.1])  # measurement noise covariance
+    ukf.Q = Q_discrete_white_noise(dim=2, dt=1.0, var=0.1)  # process noise covariance
+    return ukf
 
-    def hx(x):
-        # Measurement function
-        return np.array([x[0], x[1]])
+def track_positions(data, out):
+    for frame, objects in data.items():
+        ukf = create_ukf()
+        data_s = []
+        for i,obj_data in enumerate(objects):
+            obj_id = 'id'+str(i)
+            data = obj_data[obj_id]
+            x = data['x']
+            y = data['y']
+            measurements = np.array([(x, y)])
+            ukf.predict()
+            ukf.update(create_measurement(measurements))
+            position = {
+                'x': float(ukf.x[0]), 'y': float(ukf.x[1])
+            }
+            pp = {obj_id: position}
+            data_s.append(pp)
 
-    # Initialize UKF
-    dt = 1.0  # Time step
-    points = JulierSigmaPoints(n=4, kappa=2)  # Sigma points generator
-    ukf = UnscentedKalmanFilter(dim_x=4, dim_z=2, dt=dt, fx=fx, hx=hx, points=points)
+        yaml_data = {frame: data_s}
+        with open(out, 'a') as file:
+            yaml.dump(yaml_data, file)
 
-    # Initial state and covariance
-    ukf.x = np.array([z[0], z[1], 0., 0.])  # [x, y, vx, vy]
-    ukf.P = np.eye(4) * 0.1
+# Example usage
+input_file = '/home/sepid/workspace/Thesis/GuidingRobot/data/input.yaml'
+output_file = 'output.yaml'
 
-    # Process noise covariance
-    ukf.Q = Q_discrete_white_noise(dim=2, dt=dt, var=Q)
+# Step 1: Parse the YAML file
+data = parse_yaml_file(input_file)
 
-    # Measurement noise covariance
-    ukf.R = np.diag([R, R])
-
-    # Perform filtering
-    filtered_states = []
-    for measurement in z[2:]:
-        ukf.predict()
-        ukf.update(measurement)
-        filtered_states.append(ukf.x)
-
-    return np.array(filtered_states)
-
-
-def nearest_neighbor_association(measurements, tracks, gate_threshold):
-    associations = []
-    for i, measurement in enumerate(measurements):
-        min_distance = float('inf')
-        best_track_id = -1
-        for j, track in enumerate(tracks):
-            distance = np.linalg.norm(measurement - track)
-            if distance < min_distance and distance < gate_threshold:
-                min_distance = distance
-                best_track_id = j
-        associations.append(best_track_id)
-    return associations
-
-
-# Load data from YAML
-data = load_data_from_yaml('data.yaml')
-
-# Extract measurements
-measurements = []
-for frame in data.values():
-    for obj in frame:
-        for id_, position in obj.items():
-            measurements.append([position['x'], position['y']])
-
-# Parameters for the Unscented Kalman Filter
-R = 0.1  # Measurement noise covariance
-Q = 0.01  # Process noise covariance
-
-# Perform tracking using Unscented Kalman Filter
-filtered_states = unscented_kalman_filter(measurements, R, Q)
-
-# Perform data association using Nearest Neighbor
-gate_threshold = 1.0  # Association gate threshold
-associations = nearest_neighbor_association(measurements, filtered_states, gate_threshold)
-
-# Print the results
-for i, association in enumerate(associations):
-    measurement = measurements[i]
-    filtered_state = filtered_states[association]
-    print(f"Measurement {i} - True: {measurement}, Estimated: {filtered_state}")
+# Step 2 and 3: Track positions using Unscented Kalman Filter and nearest neighbor algorithm
+track_positions(data, output_file)
