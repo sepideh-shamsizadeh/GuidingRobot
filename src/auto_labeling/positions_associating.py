@@ -8,10 +8,12 @@ from PIL import Image
 from math import pi, atan2, hypot, floor
 from numpy import clip
 import numpy as np
-
+from sympy import symbols, Eq, solve
 import detect_people
-
 model = detect_people.load_model()
+
+
+
 
 
 def counter():
@@ -160,18 +162,20 @@ def check_intersection(d_bound, point):
     if d_bound[0] < point[0] < d_bound[2]:
         if d_bound[1] < point[1] < d_bound[3]:
             return True
-        elif abs(d_bound[3] - point[1]) <= 25:
+        elif abs(d_bound[3] - point[1]) <= 35:
             return True
-    elif abs(d_bound[0] - point[0]) <= 25 or abs(point[0] - d_bound[2]) <= 25:
+    elif abs(d_bound[0] - point[0]) <= 35 or abs(point[0] - d_bound[2]) <= 35:
         if d_bound[1] < point[1] < d_bound[3]:
             return True
-        elif abs(d_bound[3] - point[1]) <= 25:
+        elif abs(d_bound[3] - point[1]) <= 35:
             return True
     return False
 
+
 def distance(x1, y1, x2, y2):
     # Calculate the Euclidean distance between two points
-    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
 
 def check_points(x_y, p_uv, person):
     avgx = (person[0] + person[2]) / 2
@@ -179,13 +183,46 @@ def check_points(x_y, p_uv, person):
     # print('avg', avgx, avgy)
     closest_distance = float('inf')
     closest_point = None
+
     for i, p in enumerate(p_uv):
-        dist = distance(p[0], p[1], avgx, avgy)
+        u = p[0]
+        v = p[1]
+        print('1', u, v)
+        if not person[0] <= p[0] <= person[2]:
+            if p[0] <= person[0]:
+                u = p[0] + 35
+            elif p[0] >= person[2]:
+                u = p[0] - 35
+        if not person[1] <= p[1] <= person[3]:
+            if p[1] <= person[1]:
+                v = p[1] + 35
+            elif p[1] >= person[3]:
+                v = p[1] - 35
+        print('2', u, v)
+        dist = distance(u, v, avgx, avgy)
         if dist < closest_distance:
             closest_distance = dist
             closest_point = x_y[i]
     return closest_point
+def guessxy(side_info, u, v):
+    H = side_info['H']
+    fu = side_info['fu']
+    fv = side_info['fv']
+    u0 = side_info['u0']
+    v0 = side_info['v0']
+    x, y = symbols('x y')
+    a = fu * H[0] + u0 * H[4] - u * H[4]
+    b = fu * H[1] + u0 * H[5] - u * H[5]
+    k = u * H[8] - fu * H[6] - u0 * H[8]
+    c = fv * H[2] + v0 * H[4] - v * H[4]
+    d = fv * H[3] + v0 * H[5] - v * H[5]
+    l = v * H[8] - fv * H[7] - v0 * H[8]
 
+    eq1 = Eq(a * x + b * y - k, 0)
+    eq2 = Eq(c * x + d * y - l, 0)
+
+    sol_dict = solve((eq1, eq2), (x, y))
+    return sol_dict[x], sol_dict[y]
 
 def check_xy(xy, face):
     x = xy[0]
@@ -209,8 +246,6 @@ def selected_point(side_xy, side_info, face, detected):
     for person in detected:
         p = []
         x_y = []
-        x = 0
-        y = 0
         for xy in side_xy:
             x, y = check_xy(xy, face)
             u, v = convert_robotF2imageF(x, y, side_info)
@@ -218,12 +253,12 @@ def selected_point(side_xy, side_info, face, detected):
                 u = 0
             if v < 0:
                 v = 0
-            if face == 'back':
-                v -= 90
-                u += 20
-            if face == 'left':
-                u += 30
-                v -= 20
+            # if face == 'back':
+            #     v -= 90
+            #     u += 30
+            # if face == 'left':
+            #     u += 30
+            #     v -= 20
             # print('u,v', u, v)
             # draw_circle_bndBOX(u, v, cv_image)
             # print('(u, v)', (u, v))
@@ -236,11 +271,11 @@ def selected_point(side_xy, side_info, face, detected):
         x = 0
         y = 0
         # print('xy', x_y)
-        for i, pr in enumerate(XY_people):
-            if pr in x_y:
-                p.pop(i)
-        # print(p)
+
         if len(p) > 1:
+            for i, pr in enumerate(p):
+                if pr in XY_people:
+                    x_y.pop(i)
             x, y = check_points(x_y, p, person)
         elif len(p) == 1:
             x, y = x_y[0]
@@ -306,7 +341,7 @@ if __name__ == '__main__':
         'v0': 245.039671395514
     }
     scan = []
-    with open('/home/sepid/workspace/Thesis/GuidingRobot/data/scan.csv', 'r') as file:
+    with open('/home/sepid/workspace/Thesis/GuidingRobot/data0/scan.csv', 'r') as file:
         # Create a CSV reader object
         reader = csv.reader(file)
         # Read each row of the CSV file
@@ -316,7 +351,7 @@ if __name__ == '__main__':
             scan.append(ranges)
 
     dr_spaam = []
-    with open('/home/sepid/workspace/Thesis/GuidingRobot/data/drspaam4_data.csv', 'r') as file:
+    with open('/home/sepid/workspace/Thesis/GuidingRobot/data0/drspaam_data1.csv', 'r') as file:
         # Create a CSV reader object
         reader = csv.reader(file)
         # Read each row of the CSV file
@@ -327,7 +362,7 @@ if __name__ == '__main__':
     # for i in range(36, int(len(scan)/2)):
     for i in range(0, len(dr_spaam)):
 
-        path = '/home/sepid/workspace/Thesis/GuidingRobot/data/image_' + str(i) + '.jpg'
+        path = '/home/sepid/workspace/Thesis/GuidingRobot/data0/image_' + str(i) + '.jpg'
         print(path)
         if os.path.exists(path):
             img = cv2.imread(path)
@@ -399,10 +434,11 @@ if __name__ == '__main__':
                                 people.append((xy[0], xy[1]))
 
             people = list(dict.fromkeys(people))
+            # print(people)
             if len(people) > 0:
                 fid = next(counter_gen)
-                file_name = 'output1.yaml'
+                file_name = '/home/sepid/workspace/Thesis/GuidingRobot/data0/output01.yaml'
                 write_output(people, fid, file_name)
 
-            file_name = 'output1i.yaml'
-            write_output(people, i, file_name)
+            # file_name = '/home/sepid/workspace/Thesis/GuidingRobot/data0/outputi.yaml'
+            # write_output(people, i, file_name)
