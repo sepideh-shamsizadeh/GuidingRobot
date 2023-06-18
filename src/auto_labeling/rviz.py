@@ -1,0 +1,43 @@
+import rospy
+from sensor_msgs.msg import LaserScan
+import csv
+import os
+
+# Initialize ROS node
+rospy.init_node('range_publisher', anonymous=True)
+
+# Create a publisher to publish the LaserScan message
+scan_publisher = rospy.Publisher('/scan', LaserScan, queue_size=10)
+
+# Create a LaserScan message
+scan_msg = LaserScan()
+
+# Set the necessary fields of the LaserScan message
+scan_msg.header.frame_id = "base_link"  # Set the appropriate frame ID
+scan_msg.angle_min = -3.140000104904175  # Set the minimum angle
+scan_msg.angle_max = 3.140000104904175  # Set the maximum angle
+scan_msg.angle_increment = 0.005799999926239252  # Set the angle increment
+scan_msg.range_min = 0.44999998807907104  # Set the minimum range value
+scan_msg.range_max = 25.0  # Set the maximum range value
+
+angle_min = -3.140000104904175
+angle_increment = 0.005799999926239252
+
+downsample_factor = 3  # Adjust the downsample factor as needed
+
+with open('/home/sepid/workspace/Thesis/GuidingRobot/data1/scan.csv', 'r') as file1:
+    reader1 = csv.reader(file1)
+    for i, row in enumerate(reader1):
+        xx = []
+        yy = []
+        path = '/home/sepid/workspace/Thesis/GuidingRobot/data1/image_' + str(i) + '.jpg'
+        print(path)
+        if os.path.exists(path):
+            ranges = [float(value) for value in row]  # Read the ranges from the CSV file
+            scan_msg.ranges = ranges  # Set the range values in the LaserScan message
+
+            # Publish the LaserScan message
+            scan_publisher.publish(scan_msg)
+
+            # Wait for keyboard input before publishing the next message
+            input("Press Enter to publish the next scan message...")
