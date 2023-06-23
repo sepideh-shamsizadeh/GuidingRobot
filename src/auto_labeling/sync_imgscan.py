@@ -8,14 +8,14 @@ import time
 rospy.init_node('sync_image_scan', anonymous=True)
 
 def image_callback(msg):
-    scan_filename = f"/home/sepid/workspace/Thesis/GuidingRobot/data1/image.csv"
+    scan_filename = f"/home/sepid/workspace/Thesis/GuidingRobot/data2/image.csv"
     with open(scan_filename, 'a') as csvfile:
         image_data = np.frombuffer(msg.data, dtype=np.uint8).reshape((msg.height, msg.width, -1))
         writer = csv.writer(csvfile)
         writer.writerow([msg.header.stamp] + list(image_data))
 
 def scan_callback(msg):
-    scan_filename = f"/home/sepid/workspace/Thesis/GuidingRobot/data1/scan.csv"
+    scan_filename = f"/home/sepid/workspace/Thesis/GuidingRobot/data2/scan.csv"
     with open(scan_filename, 'a') as csvfile:
 
         writer = csv.writer(csvfile)

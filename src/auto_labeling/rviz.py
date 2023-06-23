@@ -25,13 +25,12 @@ angle_increment = 0.005799999926239252
 
 downsample_factor = 3  # Adjust the downsample factor as needed
 
-with open('/home/sepid/workspace/Thesis/GuidingRobot/data1/scan.csv', 'r') as file1:
+with open('/home/sepid/workspace/Thesis/GuidingRobot/data2/scan.csv', 'r') as file1:
     reader1 = csv.reader(file1)
     for i, row in enumerate(reader1):
         xx = []
         yy = []
-        path = '/home/sepid/workspace/Thesis/GuidingRobot/data1/image_' + str(i) + '.jpg'
-        print(path)
+        path = '/home/sepid/workspace/Thesis/GuidingRobot/data2/image_' + str(i) + '.jpg'
         if os.path.exists(path):
             ranges = [float(value) for value in row]  # Read the ranges from the CSV file
             scan_msg.ranges = ranges  # Set the range values in the LaserScan message
@@ -41,3 +40,5 @@ with open('/home/sepid/workspace/Thesis/GuidingRobot/data1/scan.csv', 'r') as fi
 
             # Wait for keyboard input before publishing the next message
             input("Press Enter to publish the next scan message...")
+            print(path)
+

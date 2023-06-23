@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 scan_buffer = None  # Buffer for storing the latest received image message
-scan_csv_file = "/home/sepid/workspace/Thesis/GuidingRobot/data1/scan.csv"  # File name for saving scan data
+scan_csv_file = "/home/sepid/workspace/Thesis/GuidingRobot/data2/scan.csv"  # File name for saving scan data
 inds = 0
 def counter():
     num = 0
@@ -23,14 +23,14 @@ def scan_callback(scan_msg):
     save_scan(scan_msg)
 
 def save_scan(scan_msg):
-    if inds%5 == 0:
+    if inds%8 == 0:
         with open(scan_csv_file, 'a') as file:
             writer = csv.writer(file)
-            writer.writerow([int(inds/5)] + list(scan_msg.ranges))
+            writer.writerow([int(inds/8)] + list(scan_msg.ranges))
 
 def save_image(image_msg):
-    if inds % 5 == 0:
-        image_file = '/home/sepid/workspace/Thesis/GuidingRobot/data1/image_'+str(int(inds/5))+'.jpg'
+    if inds % 8 == 0:
+        image_file = '/home/sepid/workspace/Thesis/GuidingRobot/data2/image_'+str(int(inds/8))+'.jpg'
         try:
             image_data = np.frombuffer(image_msg.data, dtype=np.uint8).reshape((image_msg.height, image_msg.width, -1))
             if image_data is None:

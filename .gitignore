@@ -244,3 +244,4 @@ src/auto_labeling/calib/scenes/*
 *.png
 data0/*
 data1/*
+data2/*
