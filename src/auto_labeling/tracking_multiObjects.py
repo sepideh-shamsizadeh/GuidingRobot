@@ -27,7 +27,9 @@ def measurement_fn(x):
 
 def handle_loss_of_id(filter_i):
     # Handle the case when an object loses its ID association
+    global current_object_id
     filter_i.object_id = None
+    current_object_id -=1
     reset_filter_state(filter_i)
 
 
@@ -54,9 +56,9 @@ def reset_filter_state(filter_i):
 num_states = 4  # Number of states (x, y, vx, vy)
 num_measurements = 2  # Number of measurements (position)
 process_noise_variance = 0.01  # Process noise variance
-measurement_noise_variance = 0.1  # Measurement noise variance
+measurement_noise_variance = 0.4  # Measurement noise variance
 dt = 0.1  # Time step
-loss_association_threshold = 3  # Number of consecutive frames without association to consider loss of measurement association
+loss_association_threshold = 10  # Number of consecutive frames without association to consider loss of measurement association
 
 # Define the process and measurement noise covariance matrices
 Q = np.eye(num_states) * process_noise_variance
@@ -107,22 +109,62 @@ for frame, frame_data in data.items():
 
             filters.append(filter_i)
     else:
+        if len(filters)<=len(measurements):
+            mes_seen = [False] * len(measurements)
         # Predict the next state for each object
         for filter_i in filters:
             positions = np.array(measurements)
             # Calculate distances between predicted state and frame positions
             distances = cdist([filter_i.x[:2]], positions)
-
             # Find the index of the nearest neighbor
             nearest_index = np.argmin(distances)
+            if np.min(distances) < 1.7:
+                # Update the state using the nearest neighbor measurement
+                nearest_measurement = np.array(positions[nearest_index]).reshape(num_measurements)
+                mes_seen[nearest_index] = True
 
-            # Update the state using the nearest neighbor measurement
-            nearest_measurement = np.array(positions[nearest_index]).reshape(num_measurements)
+                # print(nearest_measurement)
+                filter_i.predict(dt=0.1)  # Pass the time step dt
+                filter_i.update(nearest_measurement)
+                estimated_state = filter_i.x  # Estimated state after each update
+                estimated_covariance = filter_i.P
+                # print("Track position:", estimated_state[:2])
+            else:
+                filter_i.loss_association_counter += 1
+                # Handle loss of ID and new ID assignments
+        false_indices = [index for index, value in enumerate(mes_seen) if not value]
+        if len(false_indices)>0:
+            print(false_indices)
+            for ind in false_indices:
+                filter_i = UnscentedKalmanFilter(dim_x=num_states, dim_z=num_measurements, dt=dt,
+                                                 fx=state_transition_fn, hx=measurement_fn,
+                                                 points=MerweScaledSigmaPoints(num_states, alpha=0.1, beta=2.,
+                                                                               kappa=-1.0))
 
-            print(nearest_measurement)
-            filter_i.predict(dt=0.1)  # Pass the time step dt
-            filter_i.update(nearest_measurement)
+                # Set initial state and covariance matrix
+                filter_i.x = [measurements[ind][0], measurements[ind][1], 0, 0]
+                filter_i.P = initial_covariance
+                filter_i.dim_x = num_states
 
-            estimated_state = filter_i.x  # Estimated state after each update
-            estimated_covariance = filter_i.P
-            print("Track position:", estimated_state[:2])
+                # Set process and measurement noise covariance matrices
+                filter_i.Q = Q
+                filter_i.R = R
+
+                # Set object ID
+                filter_i.object_id = current_object_id+1
+                current_object_id = filter_i.object_id
+
+                # Initialize loss of measurement association counter
+                filter_i.loss_association_counter = 0
+
+                filters.append(filter_i)
+        for filter_i in filters:
+            if filter_i.loss_association_counter >= loss_association_threshold:
+                # print('loss', frame)
+                # Handle loss of ID
+                handle_loss_of_id(filter_i)
+
+            # if filter_i.object_id is None:
+            #     # print('new id', frame)
+            #     # Handle new ID assignment
+            #     handle_new_id_assignment(filter_i)
