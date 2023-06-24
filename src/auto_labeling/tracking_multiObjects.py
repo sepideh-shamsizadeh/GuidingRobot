@@ -1,8 +1,7 @@
 import yaml
 import numpy as np
-from scipy.spatial.distance import mahalanobis
 from filterpy.kalman import UnscentedKalmanFilter
-from scipy.optimize import linear_sum_assignment
+from scipy.spatial.distance import cdist
 from filterpy.kalman import MerweScaledSigmaPoints
 
 import math
@@ -110,46 +109,20 @@ for frame, frame_data in data.items():
     else:
         # Predict the next state for each object
         for filter_i in filters:
-            filter_i.predict()
+            positions = np.array(measurements)
+            # Calculate distances between predicted state and frame positions
+            distances = cdist([filter_i.x[:2]], positions)
 
-        # Associate measurements using nearest neighbor algorithm
-        for measurement in measurements:
-            for filter_i in filters:
-                # Calculate the Mahalanobis distance between the measurement and predicted measurement
-                predicted_measurement = filter_i.hx(filter_i.x)
-                distance = mahalanobis(measurement, predicted_measurement, filter_i.S)
+            # Find the index of the nearest neighbor
+            nearest_index = np.argmin(distances)
 
-                # Choose the filter with the minimum distance
-                if distance < 3.0:  # Adjust the threshold as needed
-                    # Associate the measurement with the filter
-                    filter_i.update(measurement)
-                    filter_i.loss_association_counter = 0  # Reset loss of association counter
-                    break  # Move to the next measurement
-                else:
-                    # Increment loss of association counter if no association found
-                    for filter_i in filters:
-                        filter_i.loss_association_counter += 1
+            # Update the state using the nearest neighbor measurement
+            nearest_measurement = np.array(positions[nearest_index]).reshape(num_measurements)
 
-        # Handle loss of ID and new ID assignments
-        for filter_i in filters:
-            if filter_i.loss_association_counter >= loss_association_threshold:
-                # Handle loss of ID
-                handle_loss_of_id(filter_i)
+            print(nearest_measurement)
+            filter_i.predict(dt=0.1)  # Pass the time step dt
+            filter_i.update(nearest_measurement)
 
-            if filter_i.object_id is None:
-                # Handle new ID assignment
-                handle_new_id_assignment(filter_i)
-
-            # Store the tracks for the current frame
-            object_id = filter_i.object_id
-            state = filter_i.x.tolist()
-            frame_tracks[object_id] = state
-
-        # Add the frame tracks to the overall tracks dictionary
-        tracks[frame] = frame_tracks
-
-# Save tracks to a YAML file
-with open('tracks.yaml', 'w') as f:
-    yaml.dump(tracks, f)
-
-print("Tracks saved to 'tracks.yaml'", tracks)
+            estimated_state = filter_i.x  # Estimated state after each update
+            estimated_covariance = filter_i.P
+            print("Track position:", estimated_state[:2])
