@@ -1,7 +1,10 @@
 import rospy
 from sensor_msgs.msg import LaserScan
 import csv
+import cv2
 import os
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
 
 # Initialize ROS node
 rospy.init_node('range_publisher', anonymous=True)
@@ -11,7 +14,11 @@ scan_publisher = rospy.Publisher('/scan', LaserScan, queue_size=10)
 
 # Create a LaserScan message
 scan_msg = LaserScan()
+# Create a publisher for the '/theta_camera/image_raw' topic
+image_pub = rospy.Publisher('/theta_camera/image_raw', Image, queue_size=10)
 
+# Create a CvBridge object
+bridge = CvBridge()
 # Set the necessary fields of the LaserScan message
 scan_msg.header.frame_id = "base_link"  # Set the appropriate frame ID
 scan_msg.angle_min = -3.140000104904175  # Set the minimum angle
@@ -37,6 +44,11 @@ with open('/home/sepid/workspace/Thesis/GuidingRobot/data2/scan.csv', 'r') as fi
 
             # Publish the LaserScan message
             scan_publisher.publish(scan_msg)
+            cv2_image = cv2.imread(path)
+            ros_image = bridge.cv2_to_imgmsg(cv2_image, encoding="bgr8")
+
+            # Publish the ROS message
+            image_pub.publish(ros_image)
 
             # Wait for keyboard input before publishing the next message
             input("Press Enter to publish the next scan message...")
