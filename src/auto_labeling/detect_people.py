@@ -9,13 +9,14 @@ import numpy as np
 import torch
 from numpy import random
 
-# here = os.path.dirname(os.path.abspath('yolov7'))
-sys.path.append('/home/sepid/workspace/Thesis/GuidingRobot/src/auto_labeling/yolov7')
+
+sys.path.append('/home/sepid/workspace/auto-labeling/src/yolov7')
 from yolov7.models.experimental import attempt_load
 from yolov7.utils.datasets import letterbox, LoadImages
 from yolov7.utils.general import check_img_size, non_max_suppression, scale_coords, xyxy2xywh, set_logging, xyn2xy
 from yolov7.utils.plots import plot_one_box
 from yolov7.utils.torch_utils import select_device, time_synchronized, load_classifier, TracedModel
+
 
 
 def load_model():
@@ -114,7 +115,7 @@ def detect_person(img0, model):
 
 
 if __name__ == '__main__':
-    img0 = cv2.imread('/data0/image_149.jpg')  # BGR
+    img0 = cv2.imread('/home/sepid/workspace/Thesis/GuidingRobot/data0/image_149.jpg')  # BGR
     # cv2.imshow("image", img0)
     # cv2.waitKey(0)
     model = load_model()
