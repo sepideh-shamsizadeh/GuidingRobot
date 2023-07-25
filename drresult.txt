@@ -1,0 +1,58 @@
+0
+True Positives: 281
+False Positives: 40171
+False Negatives: 227
+Gt 861
+ID 838
+
+0.1
+True Positives: 275
+False Positives: 764
+False Negatives: 543
+Gt 861
+ID 224
+
+0.2
+True Positives: 273
+False Positives: 608
+False Negatives: 572
+Gt 861
+ID 191
+
+0.3
+True Positives: 270
+False Positives: 513
+False Negatives: 593
+Gt 861
+
+
+0.4
+True Positives: 248
+False Positives: 440
+False Negatives: 611
+Gt 861
+ID 150
+
+0.5
+True Positives: 231
+False Positives: 399
+False Negatives: 627
+Gt 861
+ID 135
+
+0.6
+True Positives: 222
+False Positives: 354
+False Negatives: 638
+Gt 861
+ID 127
+
+0.7
+True Positives: 200
+False Positives: 313
+False Negatives: 659
+Gt 861
+ID 104
+
+0.8
+
