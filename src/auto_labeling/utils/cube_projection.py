@@ -14,7 +14,6 @@ class CubeProjection:
         imgIn = self.imagin
         inSize = imgIn.size
         faceSize = int(inSize[0]/4)
-        components = self.input_path.rsplit('.',2)
         FACE_NAMES = {
             0: 'back',
             1: 'left',
@@ -92,12 +91,12 @@ class CubeProjection:
 
 
 if __name__ == '__main__':
-    images = glob.glob('../../../src/calib/checkerboard/*.png')
+    images = glob.glob('/home/sepid/workspace/Thesis/GuidingRobot/src/calib/checkerboard/*.png')
     for fname in images:
         print(fname)
         print(fname.split('/'))
         name = [z for z in fname.split('/') if '.png' in z][0]
         print(name.split('.')[0])
         imgIn = Image.open(fname)
-        cube = CubeProjection(imgIn, '../../../src/calib/checkerboard/'+name.split('.')[0])
+        cube = CubeProjection(imgIn, '/home/sepid/workspace/Thesis/GuidingRobot/src/calib/checkerboard/'+name.split('.')[0])
         cube.cube_projection()

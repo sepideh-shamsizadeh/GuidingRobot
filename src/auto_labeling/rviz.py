@@ -51,6 +51,7 @@ with open('/home/sepid/workspace/Thesis/GuidingRobot/data2/scan.csv', 'r') as fi
             image_pub.publish(ros_image)
 
             # Wait for keyboard input before publishing the next message
-            input("Press Enter to publish the next scan message...")
             print(path)
+            input("Press Enter to publish the next scan message...")
+
 

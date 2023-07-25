@@ -1,0 +1,3 @@
+[submodule "src/src/auto_labeling/yolov7"]
+	path = src/src/auto_labeling/yolov7
+	url = https://github.com/WongKinYiu/yolov7.git

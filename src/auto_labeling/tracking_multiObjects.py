@@ -7,18 +7,11 @@ from filterpy.kalman import MerweScaledSigmaPoints
 
 def global_nearest_neighbor(reference_points, query_points, covariance_matrix):
     distances = cdist(reference_points, query_points, lambda u, v: mahalanobis(u, v, covariance_matrix))
-
     nearest_indices = np.argmin(distances)
-
-    if distances[nearest_indices][0] < 0.5:
-        print(reference_points)
-        print(query_points)
-        print(distances)
-        print(nearest_indices)
-        print(distances[nearest_indices])
-        return nearest_indices, distances[nearest_indices][0]
+    if distances[nearest_indices][0] < 0.7:
+        return nearest_indices
     else:
-        return -1, 0
+        return -1
 
 def state_transition_fn(x, dt):
     # Implement the state transition function
@@ -41,7 +34,7 @@ def measurement_fn(x):
 def handle_loss_of_id(filters, remove_filters):
     # Remove the filter from the list of filters
     for f in remove_filters:
-        print(f.object_id)
+        # print(f.object_id)
         filters.remove(f)
 
     # Perform any additional handling or cleanup for the lost ID
@@ -55,9 +48,9 @@ def handle_loss_of_id(filters, remove_filters):
 # Set the parameters
 num_states = 4  # Number of states (x, y, vx, vy)
 num_measurements = 2  # Number of measurements (position)
-process_noise_variance = 0.01  # Process noise variance
-measurement_noise_variance = 0.1  # Measurement noise variance
-dt = 0.1  # Time step
+process_noise_variance = 0.1  # Process noise variance
+measurement_noise_variance = 0.01  # Measurement noise variance
+dt = 0.01  # Time step
 loss_association_threshold = 2  # Number of consecutive frames without association to consider loss of measurement association
 removed_objects_p = []
 removed_objects_i = []
@@ -78,6 +71,7 @@ with open('/home/sepid/workspace/Thesis/GuidingRobot/data2/output0.yaml', 'r') a
 tracks = {}
 current_object_id = 0
 for frame, frame_data in data.items():
+    print(frame)
     # Get measurements for the current frame
     measurements = []
     p_frames = []
@@ -121,34 +115,54 @@ for frame, frame_data in data.items():
         attached = []
         # print(len(filters))
         for filter_i in filters:
-            # if filter_i.object_id == 0:
-            #     print(filter_i.x[:2])
             positions = np.array(measurements)
             # Calculate distances between predicted state and frame positions
             # distances = np.linalg.norm([filter_i.x[:2]]-positions)
             # Find the index of the nearest neighbor
             covariance_matrix = np.array([[1, 0], [0, 1]])
-            nearest_index, nearest_measurement = global_nearest_neighbor(positions, [filter_i.x[:2]],covariance_matrix)
-            if nearest_index>-1:
-                # print('ob', filter_i.object_id)
-                # print(filter_i.object_id)
-                # Update the state using the nearest neighbor measurement
+            nearest_index = global_nearest_neighbor(positions, [filter_i.x[:2]], covariance_matrix)
+
+            if len(attached) == 0:
                 nearest_measurement = np.array(positions[nearest_index]).reshape(num_measurements)
                 attached.append(nearest_measurement)
-                print('a1', attached)
+                # print('a1', attached)
                 # print(nearest_measurement)
                 filter_i.predict(dt=dt)  # Pass the time step dt
                 filter_i.update(nearest_measurement)
                 # print(filter_i.object_id,nearest_measurement)
                 estimated_state = filter_i.x  # Estimated state after each update
                 estimated_covariance = filter_i.P
-                # print('ff',filter_i.x[:2])
-                # print("Track position:", estimated_state[:2])
             else:
-                # print('ii', filter_i.object_id)
-                filter_i.loss_association_counter += 1
-                filter_i.miss_frame.append(frame)
-                # Handle loss of ID and new ID assignments
+                nearest_measurement = np.array(positions[nearest_index]).reshape(num_measurements)
+                natt = True
+                for a in attached:
+                    if a[0]==nearest_measurement[0] and a[1]==nearest_measurement[1]:
+                        natt = False
+                if natt:
+
+                    # print('ob', filter_i.object_id)
+                    # print(filter_i.object_id)
+                    # Update the state using the nearest neighbor measurement
+                    nearest_measurement = np.array(positions[nearest_index]).reshape(num_measurements)
+                    if filter_i.object_id == 1:
+                        print(positions)
+                        print(filter_i.x[:2])
+                        print(nearest_measurement)
+                    attached.append(nearest_measurement)
+                    # print('a1', attached)
+                    # print(nearest_measurement)
+                    filter_i.predict(dt=dt)  # Pass the time step dt
+                    filter_i.update(nearest_measurement)
+                    # print(filter_i.object_id,nearest_measurement)
+                    estimated_state = filter_i.x  # Estimated state after each update
+                    estimated_covariance = filter_i.P
+                    # print('ff',filter_i.x[:2])
+                    # print("Track position:", estimated_state[:2])
+                else:
+                    # print('ii', filter_i.object_id)
+                    filter_i.loss_association_counter += 1
+                    filter_i.miss_frame.append(frame)
+                    # Handle loss of ID and new ID assignments
         # print(frame, mes_seen)
         if len(measurements) > len(attached):
             not_in_attached = [element for element in measurements if all((element != arr).any() for arr in attached)]
@@ -159,9 +173,8 @@ for frame, frame_data in data.items():
                     positions = np.array(removed_objects_p)
                     # Calculate distances between predicted state and frame positions
                     covariance_matrix = np.array([[1, 0], [0, 1]])
-                    nearest_index, nearest_measurement = global_nearest_neighbor(positions, [filter_i.x[:2]],
+                    nearest_index= global_nearest_neighbor(positions, [filter_i.x[:2]],
                                                                                  covariance_matrix)
-                    print(nearest_index)
                     if nearest_index > -1:
                         filter_i = UnscentedKalmanFilter(dim_x=num_states, dim_z=num_measurements, dt=dt,
                                                          fx=state_transition_fn, hx=measurement_fn,
@@ -220,7 +233,7 @@ for frame, frame_data in data.items():
     for filter_i in filters:
         # print('check', filter_i.object_id)
         if filter_i.loss_association_counter >= loss_association_threshold:
-            if float(filter_i.miss_frame[1].split(' ')[1]) - float(filter_i.miss_frame[0].split(' ')[1]) == 1:
+            if abs(float(filter_i.miss_frame[loss_association_threshold-1].split(' ')[1]) - float(filter_i.miss_frame[loss_association_threshold-2].split(' ')[1]) )== 1:
                 # print('loss', filter_i.object_id)
                 # print('loss', frame)
                 # Handle loss of ID
